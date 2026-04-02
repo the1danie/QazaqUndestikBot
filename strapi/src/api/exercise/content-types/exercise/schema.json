@@ -1,0 +1,47 @@
+{
+  "kind": "collectionType",
+  "collectionName": "exercises",
+  "info": {
+    "singularName": "exercise",
+    "pluralName": "exercises",
+    "displayName": "Exercise"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "attributes": {
+    "type": {
+      "type": "enumeration",
+      "enum": ["suffix", "choice", "fill_blank"],
+      "required": true
+    },
+    "prompt": {
+      "type": "text",
+      "required": true
+    },
+    "answer": {
+      "type": "string",
+      "required": true
+    },
+    "explanation": {
+      "type": "text"
+    },
+    "optionA": {
+      "type": "string"
+    },
+    "optionB": {
+      "type": "string"
+    },
+    "optionC": {
+      "type": "string"
+    },
+    "optionD": {
+      "type": "string"
+    },
+    "image": {
+      "allowedTypes": ["images"],
+      "type": "media",
+      "multiple": false
+    }
+  }
+}
