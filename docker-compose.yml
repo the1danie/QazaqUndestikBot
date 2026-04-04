@@ -31,7 +31,7 @@ services:
       ADMIN_JWT_SECRET: ${STRAPI_ADMIN_JWT_SECRET}
       JWT_SECRET: ${STRAPI_JWT_SECRET}
       TRANSFER_TOKEN_SALT: ${STRAPI_TRANSFER_TOKEN_SALT}
-      NODE_ENV: development
+      NODE_ENV: production
     ports:
       - "1337:1337"
     depends_on:
@@ -39,7 +39,6 @@ services:
         condition: service_healthy
     volumes:
       - strapi_uploads:/opt/app/public/uploads
-      - ./strapi/src:/opt/app/src
 
   bot:
     build: ./bot
