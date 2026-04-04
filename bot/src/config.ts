@@ -10,8 +10,8 @@ export const config = {
   get BOT_TOKEN(): string {
     return require_env("BOT_TOKEN");
   },
-  get ANTHROPIC_API_KEY(): string {
-    return require_env("ANTHROPIC_API_KEY");
+  get ALEM_API_KEY(): string {
+    return require_env("ALEM_API_KEY");
   },
   get DATABASE_URL(): string {
     return require_env("DATABASE_URL");
@@ -21,5 +21,9 @@ export const config = {
   },
   get STRAPI_API_TOKEN(): string {
     return require_env("STRAPI_API_TOKEN");
+  },
+  get STRAPI_PUBLIC_URL(): string {
+    // URL accessible from outside Docker (for images sent to Telegram)
+    return process.env.STRAPI_PUBLIC_URL || "http://localhost:1337";
   },
 };

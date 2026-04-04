@@ -4,7 +4,7 @@
   "info": {
     "singularName": "exercise",
     "pluralName": "exercises",
-    "displayName": "Exercise"
+    "displayName": "Жаттығу"
   },
   "options": {
     "draftAndPublish": true

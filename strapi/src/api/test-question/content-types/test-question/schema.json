@@ -4,7 +4,7 @@
   "info": {
     "singularName": "test-question",
     "pluralName": "test-questions",
-    "displayName": "Test Question"
+    "displayName": "Тестовый вопрос"
   },
   "options": {
     "draftAndPublish": true

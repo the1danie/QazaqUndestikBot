@@ -1,4 +1,17 @@
 .env
 node_modules/
 dist/
-ТЗ_QazaqUndestikBot (2).docx
+*.docx
+temp_images/
+strapi/.tmp/
+strapi/dist/
+strapi/.cache/
+strapi/node_modules/
+bot/node_modules/
+bot/dist/
+set-public-permissions.mjs
+fix-permissions.mjs
+fix-strapi-permissions.sh
+configure-labels.mjs
+configure-permissions.mjs
+seed.mjs

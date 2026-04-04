@@ -69,6 +69,10 @@ export async function testsConversation(
     progressService.saveTestResult(userId, score, questions.length)
   );
 
+  // Update Strapi stats (non-blocking)
+  strapiService.updateTestStats(Number(userId), score, questions.length)
+    .catch((err) => console.error("Failed to update test stats:", err.message));
+
   await ctx.reply("Мәзірге оралу:", { reply_markup: backToMenuInline });
   await conversation.waitForCallbackQuery("menu");
 }

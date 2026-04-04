@@ -42,6 +42,21 @@ export interface Exercise {
   image?: { url: string };
 }
 
+export interface TelegramUser {
+  id: number;
+  documentId: string;
+  telegramId: string;
+  username?: string;
+  firstName?: string;
+  lastName?: string;
+  currentLevel: number;
+  totalScore: number;
+  completedExercises: number[];
+  completedTests: Array<{ date: string; score: number; total: number }>;
+  lastActiveAt: string;
+  isBlocked: boolean;
+}
+
 function httpGet(url: URL, headers: Record<string, string>): Promise<{ status: number; body: string }> {
   const requestImpl = url.protocol === "https:" ? httpsRequest : httpRequest;
 
@@ -65,6 +80,70 @@ function httpGet(url: URL, headers: Record<string, string>): Promise<{ status: n
     );
 
     req.on("error", reject);
+    req.end();
+  });
+}
+
+function httpPost(url: URL, headers: Record<string, string>, data: string): Promise<{ status: number; body: string }> {
+  const requestImpl = url.protocol === "https:" ? httpsRequest : httpRequest;
+
+  return new Promise((resolve, reject) => {
+    const req = requestImpl(
+      url,
+      {
+        method: "POST",
+        headers: {
+          ...headers,
+          "Content-Type": "application/json",
+          "Content-Length": Buffer.byteLength(data),
+        },
+      },
+      (res) => {
+        let body = "";
+        res.setEncoding("utf8");
+        res.on("data", (chunk) => {
+          body += chunk;
+        });
+        res.on("end", () => {
+          resolve({ status: res.statusCode ?? 500, body });
+        });
+      },
+    );
+
+    req.on("error", reject);
+    req.write(data);
+    req.end();
+  });
+}
+
+function httpPut(url: URL, headers: Record<string, string>, data: string): Promise<{ status: number; body: string }> {
+  const requestImpl = url.protocol === "https:" ? httpsRequest : httpRequest;
+
+  return new Promise((resolve, reject) => {
+    const req = requestImpl(
+      url,
+      {
+        method: "PUT",
+        headers: {
+          ...headers,
+          "Content-Type": "application/json",
+          "Content-Length": Buffer.byteLength(data),
+        },
+      },
+      (res) => {
+        let body = "";
+        res.setEncoding("utf8");
+        res.on("data", (chunk) => {
+          body += chunk;
+        });
+        res.on("end", () => {
+          resolve({ status: res.statusCode ?? 500, body });
+        });
+      },
+    );
+
+    req.on("error", reject);
+    req.write(data);
     req.end();
   });
 }
@@ -114,5 +193,114 @@ export const strapiService = {
       populate: "image",
       "filters[publishedAt][$notNull]": "true",
     });
+  },
+
+  async upsertTelegramUser(telegramId: number, username?: string, firstName?: string, lastName?: string): Promise<void> {
+    const url = new URL("/api/telegram-users", config.STRAPI_URL);
+    url.searchParams.set("filters[telegramId][$eq]", telegramId.toString());
+    
+    const headers = {
+      Authorization: `Bearer ${config.STRAPI_API_TOKEN}`,
+    };
+
+    // Check if user exists
+    const checkRes = await httpGet(url, headers);
+    
+    if (checkRes.status < 200 || checkRes.status >= 300) {
+      // If check fails, try to create new user
+      const createUrl = new URL("/api/telegram-users", config.STRAPI_URL);
+      const userData = {
+        telegramId: telegramId.toString(),
+        username,
+        firstName,
+        lastName,
+        lastActiveAt: new Date().toISOString(),
+      };
+      await httpPost(createUrl, headers, JSON.stringify({ data: userData }));
+      return;
+    }
+
+    const existing = JSON.parse(checkRes.body) as { data: TelegramUser[] | null };
+
+    const userData = {
+      telegramId: telegramId.toString(),
+      username,
+      firstName,
+      lastName,
+      lastActiveAt: new Date().toISOString(),
+    };
+
+    if (existing.data && existing.data.length > 0) {
+      // Update existing user
+      const user = existing.data[0];
+      const updateUrl = new URL(`/api/telegram-users/${user.documentId}`, config.STRAPI_URL);
+      await httpPut(updateUrl, headers, JSON.stringify({ data: userData }));
+    } else {
+      // Create new user
+      const createUrl = new URL("/api/telegram-users", config.STRAPI_URL);
+      await httpPost(createUrl, headers, JSON.stringify({ data: userData }));
+    }
+  },
+
+  async updateExerciseStats(telegramId: number, exerciseId: number, correct: boolean): Promise<void> {
+    const url = new URL("/api/telegram-users", config.STRAPI_URL);
+    url.searchParams.set("filters[telegramId][$eq]", telegramId.toString());
+    
+    const headers = {
+      Authorization: `Bearer ${config.STRAPI_API_TOKEN}`,
+    };
+
+    const checkRes = await httpGet(url, headers);
+    if (checkRes.status < 200 || checkRes.status >= 300) return;
+
+    const existing = JSON.parse(checkRes.body) as { data: TelegramUser[] | null };
+    if (!existing.data || existing.data.length === 0) return;
+
+    const user = existing.data[0];
+    const completedExercises = user.completedExercises || [];
+    
+    // Add exercise if not already completed
+    if (!completedExercises.includes(exerciseId)) {
+      completedExercises.push(exerciseId);
+    }
+
+    const updateUrl = new URL(`/api/telegram-users/${user.documentId}`, config.STRAPI_URL);
+    await httpPut(updateUrl, headers, JSON.stringify({
+      data: {
+        completedExercises,
+        totalScore: (user.totalScore || 0) + (correct ? 10 : 0),
+        lastActiveAt: new Date().toISOString(),
+      }
+    }));
+  },
+
+  async updateTestStats(telegramId: number, score: number, totalQuestions: number): Promise<void> {
+    const url = new URL("/api/telegram-users", config.STRAPI_URL);
+    url.searchParams.set("filters[telegramId][$eq]", telegramId.toString());
+    
+    const headers = {
+      Authorization: `Bearer ${config.STRAPI_API_TOKEN}`,
+    };
+
+    const checkRes = await httpGet(url, headers);
+    if (checkRes.status < 200 || checkRes.status >= 300) return;
+
+    const existing = JSON.parse(checkRes.body) as { data: TelegramUser[] | null };
+    if (!existing.data || existing.data.length === 0) return;
+
+    const user = existing.data[0];
+    const completedTests = user.completedTests || [];
+    
+    // Add test result
+    completedTests.push({ date: new Date().toISOString(), score, total: totalQuestions });
+
+    const updateUrl = new URL(`/api/telegram-users/${user.documentId}`, config.STRAPI_URL);
+    await httpPut(updateUrl, headers, JSON.stringify({
+      data: {
+        completedTests,
+        totalScore: (user.totalScore || 0) + score,
+        lastActiveAt: new Date().toISOString(),
+      }
+    }));
   },
 };

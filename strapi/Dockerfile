@@ -3,6 +3,6 @@ WORKDIR /opt/app
 COPY package*.json ./
 RUN npm ci
 COPY . .
-RUN npm run build
+RUN NODE_OPTIONS="--max-old-space-size=2048" npm run build
 EXPOSE 1337
-CMD ["npm", "start"]
+CMD ["npm", "run", "develop"]

@@ -9,6 +9,8 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER}"]
       interval: 5s
@@ -29,7 +31,7 @@ services:
       ADMIN_JWT_SECRET: ${STRAPI_ADMIN_JWT_SECRET}
       JWT_SECRET: ${STRAPI_JWT_SECRET}
       TRANSFER_TOKEN_SALT: ${STRAPI_TRANSFER_TOKEN_SALT}
-      NODE_ENV: production
+      NODE_ENV: development
     ports:
       - "1337:1337"
     depends_on:
@@ -37,13 +39,14 @@ services:
         condition: service_healthy
     volumes:
       - strapi_uploads:/opt/app/public/uploads
+      - ./strapi/src:/opt/app/src
 
   bot:
     build: ./bot
     environment:
       BOT_TOKEN: ${BOT_TOKEN}
-      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY}
-      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/qazaq
+      ALEM_API_KEY: ${ALEM_API_KEY}
+      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/qazaq?schema=bot
       STRAPI_URL: http://strapi:1337
       STRAPI_API_TOKEN: ${STRAPI_API_TOKEN}
     depends_on:

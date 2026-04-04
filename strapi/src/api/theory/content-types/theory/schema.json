@@ -4,7 +4,7 @@
   "info": {
     "singularName": "theory",
     "pluralName": "theories",
-    "displayName": "Theory"
+    "displayName": "Теория"
   },
   "options": {
     "draftAndPublish": true
