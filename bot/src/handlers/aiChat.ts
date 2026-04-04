@@ -5,7 +5,7 @@ import { mainMenuKeyboard } from "../keyboards/menus";
 import { aiService } from "../services/ai";
 
 const MENU_BUTTON_TEXTS = new Set([
-  "📚 Теория",
+  "📚 Ереже",
   "📹 Видео",
   "✏️ Жаттығу",
   "📝 Тест",
@@ -13,7 +13,7 @@ const MENU_BUTTON_TEXTS = new Set([
 ]);
 
 const CONVERSATION_MAP: Record<string, string> = {
-  "📚 Теория": "theory",
+  "📚 Ереже": "theory",
   "📹 Видео": "video",
   "✏️ Жаттығу": "exercises",
   "📝 Тест": "tests",

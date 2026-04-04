@@ -11,7 +11,7 @@ export async function theoryConversation(
   const items = await conversation.external(() => strapiService.getTheory());
 
   if (items.length === 0) {
-    await ctx.reply("Теория материалдары әлі жоқ.");
+    await ctx.reply("Ереже материалдары әлі жоқ.");
     await ctx.reply("Мәзірге оралу:", { reply_markup: backToMenuInline });
     await conversation.waitForCallbackQuery("menu");
     return;
@@ -24,7 +24,7 @@ export async function theoryConversation(
   });
   kb.row().text("⬅️ Мәзірге оралу", "menu");
 
-  await ctx.reply("Тақырыпты таңдаңыз:", { reply_markup: kb });
+  await ctx.reply("Ережені таңдаңыз:", { reply_markup: kb });
 
   const callbackData = items.map((i) => `t_${i.id}`);
   const selection = await conversation.waitForCallbackQuery([...callbackData, "menu"]);

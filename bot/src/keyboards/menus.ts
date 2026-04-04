@@ -1,7 +1,7 @@
 import { InlineKeyboard, Keyboard } from "grammy";
 
 export const mainMenuKeyboard = new Keyboard()
-  .text("📚 Теория")
+  .text("📚 Ереже")
   .text("📹 Видео")
   .row()
   .text("✏️ Жаттығу")

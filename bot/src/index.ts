@@ -31,7 +31,7 @@ bot.use(createConversation(testsConversation, "tests"));
 bot.use(createConversation(aiChatConversation, "aiChat"));
 
 bot.command("start", handleStart);
-bot.hears("📚 Теория", (ctx) => ctx.conversation.enter("theory"));
+bot.hears("📚 Ереже", (ctx) => ctx.conversation.enter("theory"));
 bot.hears("📹 Видео", (ctx) => ctx.conversation.enter("video"));
 bot.hears("✏️ Жаттығу", (ctx) => ctx.conversation.enter("exercises"));
 bot.hears("📝 Тест", (ctx) => ctx.conversation.enter("tests"));
