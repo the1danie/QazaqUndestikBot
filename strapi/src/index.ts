@@ -1,3 +1,4 @@
+import crypto from 'node:crypto';
 import type { Core } from '@strapi/strapi';
 
 const PUBLIC_PERMISSIONS: Record<string, string[]> = {
@@ -33,17 +34,39 @@ async function setPublicPermissions(strapi: Core.Strapi) {
   }
 }
 
-async function upgradeApiTokensToFullAccess(strapi: Core.Strapi) {
-  const tokens = await strapi.query('admin::api-token').findMany({
-    where: { type: { $ne: 'full-access' } },
+async function ensureApiToken(strapi: Core.Strapi) {
+  const rawToken = process.env.STRAPI_API_TOKEN;
+  if (!rawToken) return;
+
+  const salt = process.env.API_TOKEN_SALT ?? 'changeme';
+
+  // Strapi hashes tokens: sha512(token + salt)
+  const hashedToken = crypto
+    .createHmac('sha512', salt)
+    .update(rawToken)
+    .digest('hex');
+
+  const existing = await strapi.query('admin::api-token').findOne({
+    where: { accessKey: hashedToken },
   });
 
-  for (const token of tokens) {
-    await strapi.query('admin::api-token').update({
-      where: { id: token.id },
-      data: { type: 'full-access', permissions: [] },
+  if (!existing) {
+    await strapi.query('admin::api-token').create({
+      data: {
+        name: 'Bot API Token',
+        description: 'Auto-created for bot access',
+        type: 'full-access',
+        accessKey: hashedToken,
+        lastUsedAt: null,
+      },
     });
-    strapi.log.info(`[bootstrap] Upgraded API token "${token.name}" to full-access`);
+    strapi.log.info('[bootstrap] Created bot API token');
+  } else if (existing.type !== 'full-access') {
+    await strapi.query('admin::api-token').update({
+      where: { id: existing.id },
+      data: { type: 'full-access' },
+    });
+    strapi.log.info('[bootstrap] Upgraded API token to full-access');
   }
 }
 
@@ -52,6 +75,6 @@ export default {
 
   async bootstrap({ strapi }: { strapi: Core.Strapi }) {
     await setPublicPermissions(strapi);
-    await upgradeApiTokensToFullAccess(strapi);
+    await ensureApiToken(strapi);
   },
 };
