@@ -26,7 +26,7 @@ export async function aiChatConversation(
   const exitKb = new InlineKeyboard().text("⬅️ Мәзірге оралу", "menu");
 
   await ctx.reply(
-    "❓ Сұрағыңызды жазыңыз. Мен үндестік заңы туралы қазақша жауап беремін.\n" +
+    "❓ Сұрағыңызды жазыңыз. Мен ықпал заңы туралы қазақша жауап беремін.\n" +
       "Шығу үшін төмендегі батырманы басыңыз.",
     { reply_markup: exitKb }
   );

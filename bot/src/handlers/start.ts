@@ -17,7 +17,7 @@ export async function handleStart(ctx: MyContext): Promise<void> {
     .catch((err) => console.error("Failed to save user to Strapi:", err.message));
 
   await ctx.reply(
-    "Сәлем! Мен үндестік заңын үйретемін 📚\n\nТөмендегі мәзірден бөлімді таңдаңыз:",
+    "Сәлем! Мен ықпал заңын үйретемін 📚\n\nТөмендегі мәзірден бөлімді таңдаңыз:",
     { reply_markup: mainMenuKeyboard }
   );
 }
