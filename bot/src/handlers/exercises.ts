@@ -2,7 +2,7 @@ import { InlineKeyboard, InputFile } from "grammy";
 
 import { backToMenuInline } from "../keyboards/menus";
 import { type MyConversation, type MyContext } from "../index";
-import { adminApiService, type Exercise, type Task } from "../services/adminApi";
+import { adminApiService, type Exercise, type Task, type Topic } from "../services/adminApi";
 import { config } from "../config";
 
 async function fetchImageBuffer(url: string): Promise<Buffer | null> {
@@ -56,22 +56,19 @@ async function getAnswer(
   }
 }
 
-export async function exercisesConversation(
+async function runExercises(
   conversation: MyConversation,
-  ctx: MyContext
+  ctx: MyContext,
+  tasks: Task[],
+  exercises: Exercise[]
 ): Promise<void> {
-  const [tasks, exercises] = await conversation.external(() =>
-    Promise.all([adminApiService.getTasks(), adminApiService.getExercises()])
-  );
-
   if (tasks.length === 0 && exercises.length === 0) {
-    await ctx.reply("Жаттығулар әлі жоқ.");
+    await ctx.reply("Бұл тақырып бойынша жаттығулар әлі жоқ.");
     await ctx.reply("Мәзірге оралу:", { reply_markup: backToMenuInline });
     await conversation.waitForCallbackQuery("menu");
     return;
   }
 
-  // Show document tasks first
   for (let i = 0; i < tasks.length; i++) {
     const task = tasks[i];
     await ctx.reply(`📄 *${task.title}*\n\n${task.content}`, { parse_mode: "Markdown" });
@@ -87,7 +84,6 @@ export async function exercisesConversation(
     }
   }
 
-  // Then interactive exercises
   const telegramId = ctx.from!.id;
 
   for (let i = 0; i < exercises.length; i++) {
@@ -135,4 +131,45 @@ export async function exercisesConversation(
   await ctx.reply("🎉 Барлық жаттығулар аяқталды!");
   await ctx.reply("Мәзірге оралу:", { reply_markup: backToMenuInline });
   await conversation.waitForCallbackQuery("menu");
+}
+
+export async function exercisesConversation(
+  conversation: MyConversation,
+  ctx: MyContext
+): Promise<void> {
+  const topics = await conversation.external(() => adminApiService.getTopics());
+
+  // Build topic selection keyboard
+  const topicKb = new InlineKeyboard();
+  for (const topic of topics) {
+    topicKb.text(topic.name, `topic_${topic.id}`).row();
+  }
+  topicKb.text("📋 Барлық тақырыптар", "topic_all").row();
+  topicKb.text("⬅️ Мәзір", "menu");
+
+  await ctx.reply("📚 Тақырып таңдаңыз:", { reply_markup: topicKb });
+
+  const validCallbacks = [
+    ...topics.map((t: Topic) => `topic_${t.id}`),
+    "topic_all",
+    "menu",
+  ];
+  const cb = await conversation.waitForCallbackQuery(validCallbacks);
+  await cb.answerCallbackQuery();
+
+  if (cb.callbackQuery.data === "menu") return;
+
+  const selectedTopicId =
+    cb.callbackQuery.data === "topic_all"
+      ? undefined
+      : Number(cb.callbackQuery.data.replace("topic_", ""));
+
+  const [tasks, exercises] = await conversation.external(() =>
+    Promise.all([
+      adminApiService.getTasksByTopic(selectedTopicId),
+      adminApiService.getExercisesByTopic(selectedTopicId),
+    ])
+  );
+
+  await runExercises(conversation, ctx, tasks, exercises);
 }
