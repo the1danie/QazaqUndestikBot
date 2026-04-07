@@ -11,8 +11,8 @@ export default function DeleteVideoButton({ id }: { id: number }) {
     router.refresh();
   }
   return (
-    <Button variant="destructive" size="sm" onClick={handleDelete}>
-      <Trash2 className="mr-1 h-3 w-3" /> Жою
+    <Button variant="ghost" size="sm" className="text-destructive hover:text-destructive hover:bg-destructive/10" onClick={handleDelete}>
+      <Trash2 className="mr-1 h-3.5 w-3.5" /> Жою
     </Button>
   );
 }

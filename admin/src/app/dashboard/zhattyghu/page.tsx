@@ -3,8 +3,6 @@ import { db } from "@/lib/db";
 import DeleteTaskButton from "./DeleteTaskButton";
 import DeleteExerciseButton from "./DeleteExerciseButton";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Card, CardContent } from "@/components/ui/card";
 import { Plus, Pencil } from "lucide-react";
 
 export const dynamic = "force-dynamic";
@@ -20,8 +18,8 @@ export default async function ZhattyghuPage() {
       <h1 className="text-2xl font-bold mb-6">Жаттығу</h1>
 
       <div className="mb-8">
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="font-semibold text-gray-700">
+        <div className="flex justify-between items-center mb-3">
+          <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">
             Документ тапсырмалары ({tasks.length})
           </h2>
           <Button asChild size="sm">
@@ -30,36 +28,38 @@ export default async function ZhattyghuPage() {
             </Link>
           </Button>
         </div>
-        <div className="space-y-3">
-          {tasks.length === 0 && (
-            <p className="text-gray-500 text-sm">Тапсырма жоқ.</p>
-          )}
-          {tasks.map((item) => (
-            <Card key={item.id}>
-              <CardContent className="p-4 flex items-center justify-between">
-                <div className="space-y-1">
-                  <p className="font-medium">{item.title}</p>
-                  <Badge variant={item.published ? "default" : "secondary"}>
+        {tasks.length === 0 ? (
+          <p className="text-muted-foreground text-sm">Тапсырма жоқ.</p>
+        ) : (
+          <div className="rounded-lg border bg-card overflow-hidden">
+            {tasks.map((item, idx) => (
+              <div
+                key={item.id}
+                className={`flex items-center justify-between px-4 py-3 hover:bg-muted/40 transition-colors${idx < tasks.length - 1 ? " border-b" : ""}`}
+              >
+                <div className="flex items-center gap-3 min-w-0">
+                  <span className="font-medium truncate">{item.title}</span>
+                  <span className={`shrink-0 text-xs px-2 py-0.5 rounded-full font-medium ${item.published ? "bg-green-100 text-green-700" : "bg-amber-100 text-amber-700"}`}>
                     {item.published ? "Жарияланған" : "Черновик"}
-                  </Badge>
+                  </span>
                 </div>
-                <div className="flex gap-2">
-                  <Button variant="outline" size="sm" asChild>
+                <div className="flex gap-1 ml-4 shrink-0">
+                  <Button variant="ghost" size="sm" asChild>
                     <Link href={`/dashboard/zhattyghu/document/${item.id}`}>
-                      <Pencil className="mr-1 h-3 w-3" /> Өңдеу
+                      <Pencil className="mr-1 h-3.5 w-3.5" /> Өңдеу
                     </Link>
                   </Button>
                   <DeleteTaskButton id={item.id} />
                 </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
 
       <div>
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="font-semibold text-gray-700">
+        <div className="flex justify-between items-center mb-3">
+          <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">
             Интерактивті жаттығулар ({exercises.length})
           </h2>
           <Button asChild size="sm" variant="secondary">
@@ -68,34 +68,36 @@ export default async function ZhattyghuPage() {
             </Link>
           </Button>
         </div>
-        <div className="space-y-3">
-          {exercises.length === 0 && (
-            <p className="text-gray-500 text-sm">Жаттығу жоқ.</p>
-          )}
-          {exercises.map((item) => (
-            <Card key={item.id}>
-              <CardContent className="p-4 flex items-center justify-between">
-                <div className="space-y-1">
-                  <p className="font-medium text-sm">{item.prompt}</p>
-                  <div className="flex gap-2">
-                    <Badge variant="outline">{item.type}</Badge>
-                    <Badge variant={item.published ? "default" : "secondary"}>
-                      {item.published ? "Жарияланған" : "Черновик"}
-                    </Badge>
-                  </div>
+        {exercises.length === 0 ? (
+          <p className="text-muted-foreground text-sm">Жаттығу жоқ.</p>
+        ) : (
+          <div className="rounded-lg border bg-card overflow-hidden">
+            {exercises.map((item, idx) => (
+              <div
+                key={item.id}
+                className={`flex items-center justify-between px-4 py-3 hover:bg-muted/40 transition-colors${idx < exercises.length - 1 ? " border-b" : ""}`}
+              >
+                <div className="flex items-center gap-3 min-w-0">
+                  <span className="text-sm truncate">{item.prompt}</span>
+                  <span className="shrink-0 text-xs px-2 py-0.5 rounded-full font-medium bg-blue-100 text-blue-700">
+                    {item.type}
+                  </span>
+                  <span className={`shrink-0 text-xs px-2 py-0.5 rounded-full font-medium ${item.published ? "bg-green-100 text-green-700" : "bg-amber-100 text-amber-700"}`}>
+                    {item.published ? "Жарияланған" : "Черновик"}
+                  </span>
                 </div>
-                <div className="flex gap-2">
-                  <Button variant="outline" size="sm" asChild>
+                <div className="flex gap-1 ml-4 shrink-0">
+                  <Button variant="ghost" size="sm" asChild>
                     <Link href={`/dashboard/zhattyghu/interactive/${item.id}`}>
-                      <Pencil className="mr-1 h-3 w-3" /> Өңдеу
+                      <Pencil className="mr-1 h-3.5 w-3.5" /> Өңдеу
                     </Link>
                   </Button>
                   <DeleteExerciseButton id={item.id} />
                 </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );

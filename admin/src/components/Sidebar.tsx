@@ -3,13 +3,13 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { LogOut } from "lucide-react";
+import { LogOut, BookOpen, PenLine, FileText, Video } from "lucide-react";
 
 const NAV = [
-  { href: "/dashboard/erezhe", label: "📚 Ереже" },
-  { href: "/dashboard/zhattyghu", label: "✏️ Жаттығу" },
-  { href: "/dashboard/test", label: "📝 Тест" },
-  { href: "/dashboard/video", label: "📹 Видео" },
+  { href: "/dashboard/erezhe",    label: "Ереже",   icon: BookOpen },
+  { href: "/dashboard/zhattyghu", label: "Жаттығу", icon: PenLine  },
+  { href: "/dashboard/test",      label: "Тест",    icon: FileText },
+  { href: "/dashboard/video",     label: "Видео",   icon: Video    },
 ];
 
 export default function Sidebar() {
@@ -28,28 +28,32 @@ export default function Sidebar() {
         <p className="text-xs text-gray-400">Админ панель</p>
       </div>
       <nav className="flex-1 p-4 space-y-1">
-        {NAV.map((item) => (
-          <Link key={item.href} href={item.href}>
-            <Button
-              variant={pathname.startsWith(item.href) ? "secondary" : "ghost"}
-              className={`w-full justify-start text-sm ${
-                pathname.startsWith(item.href)
-                  ? "bg-blue-600 text-white hover:bg-blue-700"
-                  : "text-gray-300 hover:bg-gray-700 hover:text-white"
-              }`}
-            >
-              {item.label}
-            </Button>
-          </Link>
-        ))}
+        {NAV.map(({ href, label, icon: Icon }) => {
+          const active = pathname.startsWith(href);
+          return (
+            <Link key={href} href={href}>
+              <Button
+                variant="ghost"
+                className={`w-full justify-start text-sm gap-2 ${
+                  active
+                    ? "bg-blue-600 text-white hover:bg-blue-700"
+                    : "text-gray-300 hover:bg-gray-700 hover:text-white"
+                }`}
+              >
+                <Icon className="h-4 w-4 shrink-0" />
+                {label}
+              </Button>
+            </Link>
+          );
+        })}
       </nav>
       <div className="p-4 border-t border-gray-700">
         <Button
           variant="ghost"
           onClick={handleLogout}
-          className="w-full justify-start text-gray-400 hover:text-white hover:bg-gray-700"
+          className="w-full justify-start text-gray-400 hover:text-white hover:bg-gray-700 gap-2"
         >
-          <LogOut className="mr-2 h-4 w-4" />
+          <LogOut className="h-4 w-4" />
           Шығу
         </Button>
       </div>
