@@ -256,8 +256,37 @@ STRAPI_API_TOKEN
 
 ---
 
+## File Uploads (Exercise Images)
+
+Images are stored in a local folder on the server, mounted as a Docker volume.
+
+**Upload flow:**
+1. Admin form sends file via `multipart/form-data` to `POST /api/upload`
+2. API route saves file to `/uploads/` directory (Docker volume: `admin_uploads`)
+3. File served at `GET /api/files/[filename]` — Next.js API route reads and streams the file
+4. Exercise stores `imageUrl: string` (e.g. `"/api/files/abc123.png"`)
+5. Bot fetches image via `http://admin:3000/api/files/[filename]` and sends to Telegram
+
+**Prisma field added to Exercise:**
+```prisma
+imageUrl  String?  // e.g. "/api/files/abc123.png"
+```
+
+**Docker volume:**
+```yaml
+admin:
+  volumes:
+    - admin_uploads:/app/uploads
+
+volumes:
+  admin_uploads:
+```
+
+**Migration:** existing Strapi upload URLs are fetched and re-saved to the new uploads folder by the migration script.
+
+---
+
 ## Out of Scope
 
-- Image/file uploads (exercise images) — keep using Strapi uploads or remove the feature
 - Admin user management (still single user)
 - Strapi admin UI (deleted entirely)
