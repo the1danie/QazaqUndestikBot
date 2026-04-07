@@ -13,7 +13,7 @@ export async function handleStart(ctx: MyContext): Promise<void> {
     .catch((err) => console.error("Failed to upsert user:", err.message));
 
   await ctx.reply(
-    "Сәлем! Мен ықпал заңын үйретемін 📚\n\nТөмендегі мәзірден бөлімді таңдаңыз:",
+    "Сәлем! Мен үндестік заңын үйретемін 📚\n\nТөмендегі мәзірден бөлімді таңдаңыз:",
     { reply_markup: mainMenuKeyboard }
   );
 }
