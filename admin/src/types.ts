@@ -1,34 +1,44 @@
-export interface StrapiItem {
+// Prisma-based types - id is number, published is boolean
+
+export interface TheoryItem {
   id: number;
-  documentId: string;
-  publishedAt: string | null;
-}
-
-export interface TheoryItem extends StrapiItem {
   title: string;
   content: string;
   order: number;
+  published: boolean;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
-export interface TaskItem extends StrapiItem {
+export interface TaskItem {
+  id: number;
   title: string;
   content: string;
   order: number;
+  published: boolean;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
-export interface ExerciseItem extends StrapiItem {
+export interface ExerciseItem {
+  id: number;
   type: "suffix" | "choice" | "fill_blank";
   prompt: string;
   answer: string;
   correctOption: "A" | "B" | "C" | "D" | null;
-  explanation: string | null;
   optionA: string | null;
   optionB: string | null;
   optionC: string | null;
   optionD: string | null;
+  explanation: string | null;
+  imageUrl: string | null;
+  published: boolean;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
-export interface TestQuestionItem extends StrapiItem {
+export interface TestQuestionItem {
+  id: number;
   question: string;
   optionA: string;
   optionB: string;
@@ -36,10 +46,17 @@ export interface TestQuestionItem extends StrapiItem {
   optionD: string;
   correctOption: "A" | "B" | "C" | "D";
   explanation: string | null;
+  published: boolean;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
-export interface VideoItem extends StrapiItem {
+export interface VideoItem {
+  id: number;
   title: string;
   url: string;
   description: string | null;
+  published: boolean;
+  createdAt: Date;
+  updatedAt: Date;
 }

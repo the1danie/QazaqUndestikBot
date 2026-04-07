@@ -1,13 +1,17 @@
 import { NextResponse } from "next/server";
-import { strapiCreate, strapiPublish } from "@/lib/strapi";
-import type { VideoItem } from "@/types";
+import { db } from "@/lib/db";
 
 export async function POST(request: Request) {
   try {
-    const body = await request.json() as Record<string, unknown>;
-    const item = await strapiCreate<VideoItem>("videos", body);
-    await strapiPublish("videos", item.documentId);
-    return NextResponse.json({ ok: true });
+    const body = (await request.json()) as {
+      title: string;
+      url: string;
+      description?: string;
+    };
+    const item = await db.video.create({
+      data: { ...body, published: true },
+    });
+    return NextResponse.json(item);
   } catch (err) {
     return NextResponse.json({ error: String(err) }, { status: 500 });
   }

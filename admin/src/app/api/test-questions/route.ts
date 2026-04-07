@@ -1,13 +1,21 @@
 import { NextResponse } from "next/server";
-import { strapiCreate, strapiPublish } from "@/lib/strapi";
-import type { TestQuestionItem } from "@/types";
+import { db } from "@/lib/db";
 
 export async function POST(request: Request) {
   try {
-    const body = await request.json() as Record<string, unknown>;
-    const item = await strapiCreate<TestQuestionItem>("test-questions", body);
-    await strapiPublish("test-questions", item.documentId);
-    return NextResponse.json({ ok: true });
+    const body = (await request.json()) as {
+      question: string;
+      optionA: string;
+      optionB: string;
+      optionC: string;
+      optionD: string;
+      correctOption: string;
+      explanation?: string;
+    };
+    const item = await db.testQuestion.create({
+      data: { ...body, published: true },
+    });
+    return NextResponse.json(item);
   } catch (err) {
     return NextResponse.json({ error: String(err) }, { status: 500 });
   }

@@ -3,11 +3,11 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Trash2 } from "lucide-react";
 
-export default function DeleteExerciseButton({ documentId }: { documentId: string }) {
+export default function DeleteExerciseButton({ id }: { id: number }) {
   const router = useRouter();
   async function handleDelete() {
     if (!confirm("Жою керек пе?")) return;
-    await fetch(`/api/exercises/${documentId}`, { method: "DELETE" });
+    await fetch(`/api/exercises/${id}`, { method: "DELETE" });
     router.refresh();
   }
   return (

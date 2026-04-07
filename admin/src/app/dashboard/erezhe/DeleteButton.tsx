@@ -4,12 +4,12 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Trash2 } from "lucide-react";
 
-export default function DeleteButton({ documentId }: { documentId: string }) {
+export default function DeleteButton({ id }: { id: number }) {
   const router = useRouter();
 
   async function handleDelete() {
     if (!confirm("Жою керек пе?")) return;
-    await fetch(`/api/erezhe/${documentId}`, { method: "DELETE" });
+    await fetch(`/api/erezhe/${id}`, { method: "DELETE" });
     router.refresh();
   }
 

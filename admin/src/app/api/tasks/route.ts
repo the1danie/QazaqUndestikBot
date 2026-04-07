@@ -1,13 +1,18 @@
 import { NextResponse } from "next/server";
-import { strapiCreate, strapiPublish } from "@/lib/strapi";
-import type { TaskItem } from "@/types";
+import { db } from "@/lib/db";
 
 export async function POST(request: Request) {
   try {
-    const body = await request.json() as { title: string; content: string };
-    const item = await strapiCreate<TaskItem>("tasks", body);
-    await strapiPublish("tasks", item.documentId);
-    return NextResponse.json({ ok: true });
+    const { title, content } = (await request.json()) as {
+      title: string;
+      content: string;
+    };
+    const maxOrder = await db.task.aggregate({ _max: { order: true } });
+    const order = (maxOrder._max.order ?? -1) + 1;
+    const item = await db.task.create({
+      data: { title, content, order, published: true },
+    });
+    return NextResponse.json(item);
   } catch (err) {
     return NextResponse.json({ error: String(err) }, { status: 500 });
   }

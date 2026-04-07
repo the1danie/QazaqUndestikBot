@@ -9,6 +9,9 @@ strapi/.cache/
 strapi/node_modules/
 bot/node_modules/
 bot/dist/
+admin/node_modules/
+admin/.next/
+admin/prisma/migrations/
 set-public-permissions.mjs
 fix-permissions.mjs
 fix-strapi-permissions.sh

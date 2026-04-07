@@ -1,13 +1,16 @@
 import { NextResponse } from "next/server";
-import { strapiCreate, strapiPublish } from "@/lib/strapi";
-import type { TheoryItem } from "@/types";
+import { db } from "@/lib/db";
 
 export async function POST(request: Request) {
   try {
-    const body = await request.json() as { title: string; content: string };
-    const item = await strapiCreate<TheoryItem>("theories", body);
-    await strapiPublish("theories", item.documentId);
-    return NextResponse.json({ ok: true });
+    const { title, content } = (await request.json()) as {
+      title: string;
+      content: string;
+    };
+    const item = await db.theory.create({
+      data: { title, content, published: true },
+    });
+    return NextResponse.json(item);
   } catch (err) {
     return NextResponse.json({ error: String(err) }, { status: 500 });
   }
