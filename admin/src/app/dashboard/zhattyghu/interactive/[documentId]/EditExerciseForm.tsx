@@ -43,7 +43,7 @@ export default function EditExerciseForm({ item }: { item: ExerciseItem }) {
     <form onSubmit={handleSubmit} className="space-y-4">
       <div className="space-y-1">
         <Label>Тип</Label>
-        <Select value={form.type} onValueChange={(v) => set("type", v)}>
+        <Select value={form.type} onValueChange={(v) => set("type", v ?? form.type)}>
           <SelectTrigger><SelectValue /></SelectTrigger>
           <SelectContent>
             <SelectItem value="choice">Таңдау (choice)</SelectItem>
@@ -69,7 +69,7 @@ export default function EditExerciseForm({ item }: { item: ExerciseItem }) {
           </div>
           <div className="space-y-1">
             <Label>Дұрыс жауап</Label>
-            <Select value={form.correctOption} onValueChange={(v) => set("correctOption", v)}>
+            <Select value={form.correctOption} onValueChange={(v) => set("correctOption", v ?? form.correctOption)}>
               <SelectTrigger><SelectValue /></SelectTrigger>
               <SelectContent>
                 {(["A", "B", "C", "D"] as const).map((o) => <SelectItem key={o} value={o}>{o}</SelectItem>)}
