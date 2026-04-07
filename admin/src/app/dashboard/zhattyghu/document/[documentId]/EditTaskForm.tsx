@@ -3,6 +3,10 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import RichEditor from "@/components/RichEditor";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
 import type { TaskItem } from "@/types";
 
 export default function EditTaskForm({ item }: { item: TaskItem }) {
@@ -22,33 +26,34 @@ export default function EditTaskForm({ item }: { item: TaskItem }) {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ title, content, published }),
     });
-    if (res.ok) { router.push("/dashboard/zhattyghu"); router.refresh(); }
-    else { const d = await res.json() as { error: string }; setError(d.error); setSaving(false); }
+    if (res.ok) {
+      router.push("/dashboard/zhattyghu");
+      router.refresh();
+    } else {
+      const d = (await res.json()) as { error: string };
+      setError(d.error);
+      setSaving(false);
+    }
   }
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
-      <div>
-        <label className="block text-sm font-medium mb-1">Тақырып</label>
-        <input value={title} onChange={(e) => setTitle(e.target.value)}
-          className="w-full border border-gray-300 rounded-lg px-3 py-2" required />
+      <div className="space-y-1">
+        <Label>Тақырып</Label>
+        <Input value={title} onChange={(e) => setTitle(e.target.value)} required />
       </div>
-      <div>
-        <label className="block text-sm font-medium mb-1">Мазмұн</label>
+      <div className="space-y-1">
+        <Label>Мазмұн</Label>
         <RichEditor value={content} onChange={setContent} />
       </div>
       <div className="flex items-center gap-2">
-        <input type="checkbox" id="pub" checked={published} onChange={(e) => setPublished(e.target.checked)} />
-        <label htmlFor="pub" className="text-sm">Жарияланған</label>
+        <Checkbox id="pub" checked={published} onCheckedChange={(v) => setPublished(!!v)} />
+        <Label htmlFor="pub">Жарияланған</Label>
       </div>
       {error && <p className="text-red-600 text-sm">{error}</p>}
       <div className="flex gap-3">
-        <button type="submit" disabled={saving}
-          className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 disabled:opacity-50">
-          {saving ? "Сақталуда..." : "Сақтау"}
-        </button>
-        <button type="button" onClick={() => router.back()}
-          className="px-6 py-2 border border-gray-300 rounded-lg">Болдырмау</button>
+        <Button type="submit" disabled={saving}>{saving ? "Сақталуда..." : "Сақтау"}</Button>
+        <Button type="button" variant="outline" onClick={() => router.back()}>Болдырмау</Button>
       </div>
     </form>
   );
