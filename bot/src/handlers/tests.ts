@@ -2,14 +2,13 @@ import { InlineKeyboard } from "grammy";
 
 import { backToMenuInline } from "../keyboards/menus";
 import { type MyConversation, type MyContext } from "../index";
-import { progressService } from "../services/progress";
-import { strapiService, type TestQuestion } from "../services/strapi";
+import { adminApiService, type TestQuestion } from "../services/adminApi";
 
 export async function testsConversation(
   conversation: MyConversation,
   ctx: MyContext
 ): Promise<void> {
-  const questions = await conversation.external(() => strapiService.getTestQuestions());
+  const questions = await conversation.external(() => adminApiService.getTestQuestions());
 
   if (questions.length === 0) {
     await ctx.reply("Тест сұрақтары әлі жоқ.");
@@ -64,14 +63,10 @@ export async function testsConversation(
     await ctx.reply(text, { parse_mode: "Markdown" });
   }
 
-  const userId = BigInt(ctx.from!.id);
+  const telegramId = ctx.from!.id;
   await conversation.external(() =>
-    progressService.saveTestResult(userId, score, questions.length)
+    adminApiService.saveTestResult(telegramId, score, questions.length)
   );
-
-  // Update Strapi stats (non-blocking)
-  strapiService.updateTestStats(Number(userId), score, questions.length)
-    .catch((err) => console.error("Failed to update test stats:", err.message));
 
   await ctx.reply("Мәзірге оралу:", { reply_markup: backToMenuInline });
   await conversation.waitForCallbackQuery("menu");

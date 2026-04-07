@@ -2,8 +2,7 @@ import { InlineKeyboard, InputFile } from "grammy";
 
 import { backToMenuInline } from "../keyboards/menus";
 import { type MyConversation, type MyContext } from "../index";
-import { progressService } from "../services/progress";
-import { strapiService, type Exercise, type Task } from "../services/strapi";
+import { adminApiService, type Exercise, type Task } from "../services/adminApi";
 import { config } from "../config";
 
 async function fetchImageBuffer(url: string): Promise<Buffer | null> {
@@ -19,11 +18,11 @@ async function fetchImageBuffer(url: string): Promise<Buffer | null> {
 
 async function showExercise(ctx: MyContext, exercise: Exercise): Promise<void> {
   const text = `✏️ Жаттығу\n\n${exercise.prompt}`;
-  if (exercise.image?.url) {
-    const internalUrl = exercise.image.url.startsWith("http")
-      ? exercise.image.url
-      : `${config.STRAPI_URL}${exercise.image.url}`;
-    const imageBuffer = await fetchImageBuffer(internalUrl);
+  if (exercise.imageUrl) {
+    const imageUrl = exercise.imageUrl.startsWith("http")
+      ? exercise.imageUrl
+      : `${config.ADMIN_URL}${exercise.imageUrl}`;
+    const imageBuffer = await fetchImageBuffer(imageUrl);
     if (imageBuffer) {
       await ctx.replyWithPhoto(new InputFile(imageBuffer, "exercise.png"), { caption: text });
     } else {
@@ -62,7 +61,7 @@ export async function exercisesConversation(
   ctx: MyContext
 ): Promise<void> {
   const [tasks, exercises] = await conversation.external(() =>
-    Promise.all([strapiService.getTasks(), strapiService.getExercises()])
+    Promise.all([adminApiService.getTasks(), adminApiService.getExercises()])
   );
 
   if (tasks.length === 0 && exercises.length === 0) {
@@ -89,7 +88,7 @@ export async function exercisesConversation(
   }
 
   // Then interactive exercises
-  const userId = BigInt(ctx.from!.id);
+  const telegramId = ctx.from!.id;
 
   for (let i = 0; i < exercises.length; i++) {
     const exercise = exercises[i];
@@ -106,12 +105,8 @@ export async function exercisesConversation(
     const isCorrect = normalizedUser === correctAnswer;
 
     await conversation.external(() =>
-      progressService.saveExerciseResult(userId, exercise.id, isCorrect)
+      adminApiService.saveExerciseResult(telegramId, exercise.id, isCorrect)
     );
-
-    strapiService
-      .updateExerciseStats(Number(userId), exercise.id, isCorrect)
-      .catch((err) => console.error("Failed to update exercise stats:", err.message));
 
     if (isCorrect) {
       await ctx.reply(`✅ Дұрыс!\n\n${exercise.explanation ?? ""}`);

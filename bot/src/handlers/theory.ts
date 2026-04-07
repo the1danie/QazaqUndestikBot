@@ -2,13 +2,13 @@ import { InlineKeyboard } from "grammy";
 
 import { backToMenuInline } from "../keyboards/menus";
 import { type MyConversation, type MyContext } from "../index";
-import { strapiService } from "../services/strapi";
+import { adminApiService } from "../services/adminApi";
 
 export async function theoryConversation(
   conversation: MyConversation,
   ctx: MyContext
 ): Promise<void> {
-  const items = await conversation.external(() => strapiService.getTheory());
+  const items = await conversation.external(() => adminApiService.getTheory());
 
   if (items.length === 0) {
     await ctx.reply("Ереже материалдары әлі жоқ.");

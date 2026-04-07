@@ -1,12 +1,12 @@
 import { backToMenuInline } from "../keyboards/menus";
 import { type MyConversation, type MyContext } from "../index";
-import { strapiService } from "../services/strapi";
+import { adminApiService } from "../services/adminApi";
 
 export async function videoConversation(
   conversation: MyConversation,
   ctx: MyContext
 ): Promise<void> {
-  const videos = await conversation.external(() => strapiService.getVideos());
+  const videos = await conversation.external(() => adminApiService.getVideos());
 
   if (videos.length === 0) {
     await ctx.reply("Видеолар әлі жоқ.");
