@@ -8,10 +8,18 @@ import { Plus, Pencil } from "lucide-react";
 export const dynamic = "force-dynamic";
 
 export default async function ZhattyghuPage() {
-  const [tasks, exercises] = await Promise.all([
+  const [tasks, exercises, topics] = await Promise.all([
     db.task.findMany({ orderBy: { order: "asc" } }),
     db.exercise.findMany(),
+    db.topic.findMany({ orderBy: { order: "asc" } }),
   ]);
+
+  const topicMap = new Map(topics.map((t) => [t.id, t.name]));
+
+  function topicLabel(topicId: number | null) {
+    if (!topicId) return "Тақырыпсыз";
+    return topicMap.get(topicId) ?? "Тақырыпсыз";
+  }
 
   return (
     <div>
@@ -39,6 +47,9 @@ export default async function ZhattyghuPage() {
               >
                 <div className="flex items-center gap-3 min-w-0">
                   <span className="font-medium truncate">{item.title}</span>
+                  <span className="shrink-0 text-xs px-2 py-0.5 rounded-full font-medium bg-purple-100 text-purple-700">
+                    {topicLabel(item.topicId)}
+                  </span>
                   <span className={`shrink-0 text-xs px-2 py-0.5 rounded-full font-medium ${item.published ? "bg-green-100 text-green-700" : "bg-amber-100 text-amber-700"}`}>
                     {item.published ? "Жарияланған" : "Черновик"}
                   </span>
@@ -79,6 +90,9 @@ export default async function ZhattyghuPage() {
               >
                 <div className="flex items-center gap-3 min-w-0">
                   <span className="text-sm truncate">{item.prompt}</span>
+                  <span className="shrink-0 text-xs px-2 py-0.5 rounded-full font-medium bg-purple-100 text-purple-700">
+                    {topicLabel(item.topicId)}
+                  </span>
                   <span className="shrink-0 text-xs px-2 py-0.5 rounded-full font-medium bg-blue-100 text-blue-700">
                     {item.type}
                   </span>

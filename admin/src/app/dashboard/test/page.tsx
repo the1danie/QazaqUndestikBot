@@ -7,7 +7,18 @@ import { Plus, Pencil } from "lucide-react";
 export const dynamic = "force-dynamic";
 
 export default async function TestPage() {
-  const items = await db.testQuestion.findMany();
+  const [items, topics] = await Promise.all([
+    db.testQuestion.findMany(),
+    db.topic.findMany({ orderBy: { order: "asc" } }),
+  ]);
+
+  const topicMap = new Map(topics.map((t) => [t.id, t.name]));
+
+  function topicLabel(topicId: number | null) {
+    if (!topicId) return "Тақырыпсыз";
+    return topicMap.get(topicId) ?? "Тақырыпсыз";
+  }
+
   return (
     <div>
       <div className="flex justify-between items-center mb-6">
@@ -30,6 +41,9 @@ export default async function TestPage() {
             >
               <div className="flex items-center gap-3 min-w-0">
                 <span className="text-sm truncate">{item.question}</span>
+                <span className="shrink-0 text-xs px-2 py-0.5 rounded-full font-medium bg-purple-100 text-purple-700">
+                  {topicLabel(item.topicId)}
+                </span>
                 <span className={`shrink-0 text-xs px-2 py-0.5 rounded-full font-medium ${item.published ? "bg-green-100 text-green-700" : "bg-amber-100 text-amber-700"}`}>
                   {item.published ? "Жарияланған" : "Черновик"}
                 </span>
