@@ -16,10 +16,11 @@ export async function PUT(
       correctOption: string;
       explanation?: string;
       published: boolean;
+      topicId?: number | null;
     };
     const item = await db.testQuestion.update({
       where: { id: Number(id) },
-      data: body,
+      data: { ...body, topicId: body.topicId ?? null },
     });
     return NextResponse.json(item);
   } catch (err) {

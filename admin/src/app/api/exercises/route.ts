@@ -14,9 +14,10 @@ export async function POST(request: Request) {
       optionD?: string;
       explanation?: string;
       imageUrl?: string;
+      topicId?: number | null;
     };
     const item = await db.exercise.create({
-      data: { ...body, published: true },
+      data: { ...body, topicId: body.topicId ?? null, published: true },
     });
     return NextResponse.json(item);
   } catch (err) {

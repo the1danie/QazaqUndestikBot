@@ -11,9 +11,10 @@ export async function POST(request: Request) {
       optionD: string;
       correctOption: string;
       explanation?: string;
+      topicId?: number | null;
     };
     const item = await db.testQuestion.create({
-      data: { ...body, published: true },
+      data: { ...body, topicId: body.topicId ?? null, published: true },
     });
     return NextResponse.json(item);
   } catch (err) {
