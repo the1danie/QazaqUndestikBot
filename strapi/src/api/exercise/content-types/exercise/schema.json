@@ -23,6 +23,10 @@
       "type": "string",
       "required": true
     },
+    "correctOption": {
+      "type": "enumeration",
+      "enum": ["A", "B", "C", "D"]
+    },
     "explanation": {
       "type": "text"
     },

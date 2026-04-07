@@ -33,6 +33,46 @@ describe("strapiService.getTheory", () => {
     expect(items[0].title).toBe("Буын үндестігі");
     expect(items[0].id).toBe(1);
   });
+
+  it("normalizes STRAPI_API_TOKEN when it includes Bearer prefix", async () => {
+    process.env.STRAPI_API_TOKEN = "Bearer test-token";
+
+    nock(BASE, {
+      reqheaders: {
+        authorization: "Bearer test-token",
+      },
+    })
+      .get("/api/theories")
+      .query({
+        "sort[0]": "order:asc",
+        "pagination[pageSize]": "100",
+        "filters[publishedAt][$notNull]": "true",
+      })
+      .reply(200, { data: [], meta: {} });
+
+    await expect(strapiService.getTheory()).resolves.toEqual([]);
+  });
+
+  it("throws actionable message on 401", async () => {
+    nock(BASE)
+      .get("/api/theories")
+      .query({
+        "sort[0]": "order:asc",
+        "pagination[pageSize]": "100",
+        "filters[publishedAt][$notNull]": "true",
+      })
+      .reply(401, {
+        data: null,
+        error: {
+          status: 401,
+          name: "UnauthorizedError",
+          message: "Missing or invalid credentials",
+          details: {},
+        },
+      });
+
+    await expect(strapiService.getTheory()).rejects.toThrow("Strapi auth failed (401)");
+  });
 });
 
 describe("strapiService.getVideos", () => {

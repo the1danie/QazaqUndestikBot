@@ -13,7 +13,7 @@ jest.mock("@anthropic-ai/sdk", () => ({
 
 describe("aiService.ask", () => {
   it("returns text from Claude response", async () => {
-    const answer = await aiService.ask("Үндестік заңы дегеніміз не?");
+    const answer = await aiService.ask("Үндестік заңы дегеніміз не?", "Үндестік заңы туралы материал.");
     expect(answer).toBe("Тест жауабы");
   });
 
@@ -25,6 +25,6 @@ describe("aiService.ask", () => {
       },
     }));
 
-    await expect(aiService.ask("Сұрақ")).rejects.toThrow("No text content in AI response");
+    await expect(aiService.ask("Сұрақ", "")).rejects.toThrow("No text content in AI response");
   });
 });

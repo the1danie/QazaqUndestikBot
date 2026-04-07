@@ -20,7 +20,12 @@
     },
     "order": {
       "type": "integer",
-      "default": 0
+      "default": 0,
+      "pluginOptions": {
+        "content-manager": {
+          "visible": false
+        }
+      }
     }
   }
 }

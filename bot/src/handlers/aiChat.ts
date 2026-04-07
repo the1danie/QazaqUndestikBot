@@ -3,6 +3,7 @@ import { InlineKeyboard } from "grammy";
 import { type MyConversation, type MyContext } from "../index";
 import { mainMenuKeyboard } from "../keyboards/menus";
 import { aiService } from "../services/ai";
+import { strapiService } from "../services/strapi";
 
 const MENU_BUTTON_TEXTS = new Set([
   "📚 Ереже",
@@ -25,8 +26,14 @@ export async function aiChatConversation(
 ): Promise<void> {
   const exitKb = new InlineKeyboard().text("⬅️ Мәзірге оралу", "menu");
 
+  // Load theory from Strapi once for the session
+  const theoryItems = await conversation.external(() => strapiService.getTheory());
+  const theoryContext = theoryItems.length > 0
+    ? theoryItems.map((item) => `**${item.title}**\n${item.content}`).join("\n\n")
+    : "";
+
   await ctx.reply(
-    "❓ Сұрағыңызды жазыңыз. Мен ықпал заңы туралы қазақша жауап беремін.\n" +
+    "❓ Сұрағыңызды жазыңыз. Мен қазақ тілі ережелері бойынша жауап беремін.\n" +
       "Шығу үшін төмендегі батырманы басыңыз.",
     { reply_markup: exitKb }
   );
@@ -62,7 +69,7 @@ export async function aiChatConversation(
 
     let answer: string;
     try {
-      answer = await conversation.external(() => aiService.ask(userQuestion));
+      answer = await conversation.external(() => aiService.ask(userQuestion, theoryContext));
     } catch (err) {
       console.error("AI error:", err);
       answer = "Кешіріңіз, қате пайда болды. Қайтадан сұраңыз.";

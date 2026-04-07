@@ -2,15 +2,17 @@ import { request as httpsRequest } from "node:https";
 
 import { config } from "../config";
 
-const SYSTEM_PROMPT =
-  "Сен 5-сынып оқушыларына арналған Telegram оқыту ботысың. Тақырып: қазақ тілінің ықпал заңы.\n" +
+const BASE_SYSTEM_PROMPT =
+  "Сен 5-сынып оқушыларына арналған Telegram оқыту ботысың. Тақырып: қазақ тілі ережелері.\n" +
   "Ережелер:\n" +
-  "- Тек осы тақырып бойынша қазақша жауап бер.\n" +
+  "- Тек берілген материал негізінде қазақша жауап бер.\n" +
+  "- Берілген материалда жоқ нәрсе туралы жауап берме.\n" +
   "- Жауап қысқа болсын: 3-5 сөйлем.\n" +
   "- Кесте, ### тақырып, --- белгілер ҚОЛДАНБА.\n" +
   "- Тек *қалың* мәтін және қарапайым тізім нүктелері (•) қолдан.\n" +
   "- Мысал берсең, жақша ішінде жаз: (мысалы: үй → үйге).\n" +
-  "- 5-сынып оқушысына түсінікті, қарапайым тілде жаз.";
+  "- 5-сынып оқушысына түсінікті, қарапайым тілде жаз.\n\n" +
+  "Оқу материалы:\n";
 
 function httpPost(url: URL, headers: Record<string, string>, data: string): Promise<{ status: number; body: string }> {
   return new Promise((resolve, reject) => {
@@ -38,13 +40,15 @@ function httpPost(url: URL, headers: Record<string, string>, data: string): Prom
 }
 
 export const aiService = {
-  async ask(userMessage: string): Promise<string> {
+  async ask(userMessage: string, theoryContext: string): Promise<string> {
     const url = new URL("https://llm.alem.ai/chat/completions");
+
+    const systemPrompt = BASE_SYSTEM_PROMPT + theoryContext;
 
     const payload = JSON.stringify({
       model: "gpt-oss",
       messages: [
-        { role: "system", content: SYSTEM_PROMPT },
+        { role: "system", content: systemPrompt },
         { role: "user", content: userMessage },
       ],
     });
