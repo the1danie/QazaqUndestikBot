@@ -2,6 +2,10 @@ import Link from "next/link";
 import { strapiList } from "@/lib/strapi";
 import type { TheoryItem } from "@/types";
 import DeleteButton from "./DeleteButton";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Card, CardContent } from "@/components/ui/card";
+import { Plus, Pencil } from "lucide-react";
 
 export const dynamic = "force-dynamic";
 
@@ -12,27 +16,33 @@ export default async function ErezhePage() {
     <div>
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold">Ереже</h1>
-        <Link href="/dashboard/erezhe/new"
-          className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
-          + Қосу
-        </Link>
+        <Button asChild>
+          <Link href="/dashboard/erezhe/new">
+            <Plus className="mr-2 h-4 w-4" /> Қосу
+          </Link>
+        </Button>
       </div>
       <div className="space-y-3">
         {items.length === 0 && <p className="text-gray-500">Ереже жоқ.</p>}
         {items.map((item) => (
-          <div key={item.documentId} className="bg-white rounded-lg p-4 shadow-sm flex items-center justify-between">
-            <div>
-              <p className="font-medium">{item.title}</p>
-              <span className={`text-xs px-2 py-0.5 rounded-full ${item.publishedAt ? "bg-green-100 text-green-700" : "bg-yellow-100 text-yellow-700"}`}>
-                {item.publishedAt ? "Жарияланған" : "Черновик"}
-              </span>
-            </div>
-            <div className="flex gap-2">
-              <Link href={`/dashboard/erezhe/${item.documentId}`}
-                className="text-sm text-blue-600 hover:underline">Өңдеу</Link>
-              <DeleteButton documentId={item.documentId} />
-            </div>
-          </div>
+          <Card key={item.documentId}>
+            <CardContent className="p-4 flex items-center justify-between">
+              <div className="space-y-1">
+                <p className="font-medium">{item.title}</p>
+                <Badge variant={item.publishedAt ? "default" : "secondary"}>
+                  {item.publishedAt ? "Жарияланған" : "Черновик"}
+                </Badge>
+              </div>
+              <div className="flex gap-2">
+                <Button variant="outline" size="sm" asChild>
+                  <Link href={`/dashboard/erezhe/${item.documentId}`}>
+                    <Pencil className="mr-1 h-3 w-3" /> Өңдеу
+                  </Link>
+                </Button>
+                <DeleteButton documentId={item.documentId} />
+              </div>
+            </CardContent>
+          </Card>
         ))}
       </div>
     </div>

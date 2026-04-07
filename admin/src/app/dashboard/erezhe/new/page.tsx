@@ -3,6 +3,9 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import RichEditor from "@/components/RichEditor";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 
 export default function NewErezhePage() {
   const router = useRouter();
@@ -24,7 +27,7 @@ export default function NewErezhePage() {
       router.push("/dashboard/erezhe");
       router.refresh();
     } else {
-      const d = await res.json() as { error: string };
+      const d = (await res.json()) as { error: string };
       setError(d.error);
       setSaving(false);
     }
@@ -34,25 +37,22 @@ export default function NewErezhePage() {
     <div className="max-w-2xl">
       <h1 className="text-2xl font-bold mb-6">Жаңа ереже</h1>
       <form onSubmit={handleSubmit} className="space-y-4">
-        <div>
-          <label className="block text-sm font-medium mb-1">Тақырып</label>
-          <input value={title} onChange={(e) => setTitle(e.target.value)}
-            className="w-full border border-gray-300 rounded-lg px-3 py-2" required />
+        <div className="space-y-1">
+          <Label>Тақырып</Label>
+          <Input value={title} onChange={(e) => setTitle(e.target.value)} required />
         </div>
-        <div>
-          <label className="block text-sm font-medium mb-1">Мазмұн</label>
+        <div className="space-y-1">
+          <Label>Мазмұн</Label>
           <RichEditor value={content} onChange={setContent} />
         </div>
         {error && <p className="text-red-600 text-sm">{error}</p>}
         <div className="flex gap-3">
-          <button type="submit" disabled={saving}
-            className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 disabled:opacity-50">
+          <Button type="submit" disabled={saving}>
             {saving ? "Сақталуда..." : "Жарияла"}
-          </button>
-          <button type="button" onClick={() => router.back()}
-            className="px-6 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">
+          </Button>
+          <Button type="button" variant="outline" onClick={() => router.back()}>
             Болдырмау
-          </button>
+          </Button>
         </div>
       </form>
     </div>

@@ -1,6 +1,8 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button";
+import { Trash2 } from "lucide-react";
 
 export default function DeleteButton({ documentId }: { documentId: string }) {
   const router = useRouter();
@@ -12,8 +14,8 @@ export default function DeleteButton({ documentId }: { documentId: string }) {
   }
 
   return (
-    <button onClick={handleDelete} className="text-sm text-red-500 hover:underline">
-      Жою
-    </button>
+    <Button variant="destructive" size="sm" onClick={handleDelete}>
+      <Trash2 className="mr-1 h-3 w-3" /> Жою
+    </Button>
   );
 }
