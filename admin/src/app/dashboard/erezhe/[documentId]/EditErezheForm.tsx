@@ -17,13 +17,13 @@ export default function EditErezheForm({ item }: { item: TheoryItem }) {
     e.preventDefault();
     setSaving(true);
     setError("");
-    const res = await fetch(`/api/ereзhe/${item.documentId}`, {
+    const res = await fetch(`/api/erezhe/${item.documentId}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ title, content, published }),
     });
     if (res.ok) {
-      router.push("/dashboard/ereзhe");
+      router.push("/dashboard/erezhe");
       router.refresh();
     } else {
       const d = await res.json() as { error: string };

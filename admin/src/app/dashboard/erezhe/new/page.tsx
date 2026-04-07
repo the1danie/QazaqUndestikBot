@@ -15,13 +15,13 @@ export default function NewErezhePage() {
     e.preventDefault();
     setSaving(true);
     setError("");
-    const res = await fetch("/api/ereзhe", {
+    const res = await fetch("/api/erezhe", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ title, content }),
     });
     if (res.ok) {
-      router.push("/dashboard/ereзhe");
+      router.push("/dashboard/erezhe");
       router.refresh();
     } else {
       const d = await res.json() as { error: string };

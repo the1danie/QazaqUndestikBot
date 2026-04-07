@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 
 const NAV = [
-  { href: "/dashboard/ereзhe", label: "📚 Ереже" },
+  { href: "/dashboard/erezhe", label: "📚 Ереже" },
   { href: "/dashboard/zhattyghu", label: "✏️ Жаттығу" },
   { href: "/dashboard/test", label: "📝 Тест" },
   { href: "/dashboard/video", label: "📹 Видео" },

@@ -7,7 +7,7 @@ export default function DeleteButton({ documentId }: { documentId: string }) {
 
   async function handleDelete() {
     if (!confirm("Жою керек пе?")) return;
-    await fetch(`/api/ereзhe/${documentId}`, { method: "DELETE" });
+    await fetch(`/api/erezhe/${documentId}`, { method: "DELETE" });
     router.refresh();
   }
 
