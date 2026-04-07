@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import RichEditor from "@/components/RichEditor";
+import DocxUploadButton from "@/components/DocxUploadButton";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -43,7 +44,10 @@ export default function EditErezheForm({ item }: { item: TheoryItem }) {
         <Input value={title} onChange={(e) => setTitle(e.target.value)} required />
       </div>
       <div className="space-y-1">
-        <Label>Мазмұн</Label>
+        <div className="flex items-center justify-between">
+          <Label>Мазмұн</Label>
+          <DocxUploadButton onText={setContent} />
+        </div>
         <RichEditor value={content} onChange={setContent} />
       </div>
       <div className="flex items-center gap-2">
