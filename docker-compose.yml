@@ -17,58 +17,33 @@ services:
       timeout: 5s
       retries: 10
 
-  strapi:
-    build: ./strapi
+  admin:
+    build: ./admin
     environment:
-      DATABASE_CLIENT: postgres
-      DATABASE_HOST: postgres
-      DATABASE_PORT: 5432
-      DATABASE_NAME: qazaq
-      DATABASE_USERNAME: ${POSTGRES_USER}
-      DATABASE_PASSWORD: ${POSTGRES_PASSWORD}
-      APP_KEYS: ${STRAPI_APP_KEYS}
-      API_TOKEN_SALT: ${STRAPI_API_TOKEN_SALT}
-      STRAPI_API_TOKEN: ${STRAPI_API_TOKEN}
-      ADMIN_JWT_SECRET: ${STRAPI_ADMIN_JWT_SECRET}
-      JWT_SECRET: ${STRAPI_JWT_SECRET}
-      TRANSFER_TOKEN_SALT: ${STRAPI_TRANSFER_TOKEN_SALT}
-      NODE_ENV: production
+      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/qazaq?schema=admin
+      ADMIN_USERNAME: ${ADMIN_USERNAME}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD}
+      ADMIN_SESSION_SECRET: ${ADMIN_SESSION_SECRET}
+      ADMIN_BOT_SECRET: ${ADMIN_BOT_SECRET}
     ports:
-      - "1337:1337"
+      - "3000:3000"
     depends_on:
       postgres:
         condition: service_healthy
     volumes:
-      - strapi_uploads:/opt/app/public/uploads
+      - admin_uploads:/app/uploads
 
   bot:
     build: ./bot
     environment:
       BOT_TOKEN: ${BOT_TOKEN}
       ALEM_API_KEY: ${ALEM_API_KEY}
-      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/qazaq?schema=bot
-      STRAPI_URL: http://strapi:1337
-      STRAPI_API_TOKEN: ${STRAPI_API_TOKEN}
+      ADMIN_URL: http://admin:3000
+      ADMIN_BOT_SECRET: ${ADMIN_BOT_SECRET}
     depends_on:
-      postgres:
-        condition: service_healthy
-      strapi:
-        condition: service_started
-
-  admin:
-    build: ./admin
-    environment:
-      STRAPI_URL: http://strapi:1337
-      STRAPI_API_TOKEN: ${STRAPI_API_TOKEN}
-      ADMIN_USERNAME: ${ADMIN_USERNAME}
-      ADMIN_PASSWORD: ${ADMIN_PASSWORD}
-      ADMIN_SESSION_SECRET: ${ADMIN_SESSION_SECRET}
-    ports:
-      - "3000:3000"
-    depends_on:
-      strapi:
+      admin:
         condition: service_started
 
 volumes:
   postgres_data:
-  strapi_uploads:
+  admin_uploads:
