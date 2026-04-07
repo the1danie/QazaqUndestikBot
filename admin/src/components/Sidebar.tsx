@@ -2,6 +2,8 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button";
+import { LogOut } from "lucide-react";
 
 const NAV = [
   { href: "/dashboard/erezhe", label: "📚 Ереже" },
@@ -27,26 +29,29 @@ export default function Sidebar() {
       </div>
       <nav className="flex-1 p-4 space-y-1">
         {NAV.map((item) => (
-          <Link
-            key={item.href}
-            href={item.href}
-            className={`block px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-              pathname.startsWith(item.href)
-                ? "bg-blue-600 text-white"
-                : "text-gray-300 hover:bg-gray-700"
-            }`}
-          >
-            {item.label}
+          <Link key={item.href} href={item.href}>
+            <Button
+              variant={pathname.startsWith(item.href) ? "secondary" : "ghost"}
+              className={`w-full justify-start text-sm ${
+                pathname.startsWith(item.href)
+                  ? "bg-blue-600 text-white hover:bg-blue-700"
+                  : "text-gray-300 hover:bg-gray-700 hover:text-white"
+              }`}
+            >
+              {item.label}
+            </Button>
           </Link>
         ))}
       </nav>
       <div className="p-4 border-t border-gray-700">
-        <button
+        <Button
+          variant="ghost"
           onClick={handleLogout}
-          className="w-full text-left text-sm text-gray-400 hover:text-white"
+          className="w-full justify-start text-gray-400 hover:text-white hover:bg-gray-700"
         >
-          Шығу →
-        </button>
+          <LogOut className="mr-2 h-4 w-4" />
+          Шығу
+        </Button>
       </div>
     </aside>
   );
