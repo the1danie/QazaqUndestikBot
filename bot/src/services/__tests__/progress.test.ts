@@ -1,52 +1,38 @@
 import { progressService } from "../progress";
-import { prisma } from "../../db/prisma";
+import { adminApiService } from "../adminApi";
 
-jest.mock("../../db/prisma", () => ({
-  prisma: {
-    user: {
-      upsert: jest.fn(),
-    },
-    testResult: {
-      create: jest.fn(),
-    },
-    exerciseResult: {
-      create: jest.fn(),
-    },
+jest.mock("../adminApi", () => ({
+  adminApiService: {
+    upsertUser: jest.fn(),
+    saveTestResult: jest.fn(),
+    saveExerciseResult: jest.fn(),
   },
 }));
 
-const mockedPrisma = prisma as jest.Mocked<typeof prisma>;
+const mockedApi = adminApiService as jest.Mocked<typeof adminApiService>;
 
 beforeEach(() => jest.clearAllMocks());
 
 describe("progressService.upsertUser", () => {
-  it("calls prisma.user.upsert with correct args", async () => {
-    (mockedPrisma.user.upsert as jest.Mock).mockResolvedValue({});
-    await progressService.upsertUser(BigInt(123), "alice");
-    expect(mockedPrisma.user.upsert).toHaveBeenCalledWith({
-      where: { id: BigInt(123) },
-      update: { username: "alice" },
-      create: { id: BigInt(123), username: "alice" },
-    });
+  it("delegates to adminApiService.upsertUser", async () => {
+    mockedApi.upsertUser.mockResolvedValue(undefined);
+    await progressService.upsertUser(123, "alice", "Alice", "Smith");
+    expect(mockedApi.upsertUser).toHaveBeenCalledWith(123, "alice", "Alice", "Smith");
   });
 });
 
 describe("progressService.saveTestResult", () => {
-  it("calls prisma.testResult.create with correct args", async () => {
-    (mockedPrisma.testResult.create as jest.Mock).mockResolvedValue({});
-    await progressService.saveTestResult(BigInt(123), 7, 10);
-    expect(mockedPrisma.testResult.create).toHaveBeenCalledWith({
-      data: { userId: BigInt(123), score: 7, total: 10 },
-    });
+  it("delegates to adminApiService.saveTestResult", async () => {
+    mockedApi.saveTestResult.mockResolvedValue(undefined);
+    await progressService.saveTestResult(123, 7, 10);
+    expect(mockedApi.saveTestResult).toHaveBeenCalledWith(123, 7, 10);
   });
 });
 
 describe("progressService.saveExerciseResult", () => {
-  it("calls prisma.exerciseResult.create with correct args", async () => {
-    (mockedPrisma.exerciseResult.create as jest.Mock).mockResolvedValue({});
-    await progressService.saveExerciseResult(BigInt(123), 5, true);
-    expect(mockedPrisma.exerciseResult.create).toHaveBeenCalledWith({
-      data: { userId: BigInt(123), exerciseId: 5, isCorrect: true },
-    });
+  it("delegates to adminApiService.saveExerciseResult", async () => {
+    mockedApi.saveExerciseResult.mockResolvedValue(undefined);
+    await progressService.saveExerciseResult(123, 5, true);
+    expect(mockedApi.saveExerciseResult).toHaveBeenCalledWith(123, 5, true);
   });
 });
