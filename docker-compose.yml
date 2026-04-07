@@ -28,6 +28,7 @@ services:
       DATABASE_PASSWORD: ${POSTGRES_PASSWORD}
       APP_KEYS: ${STRAPI_APP_KEYS}
       API_TOKEN_SALT: ${STRAPI_API_TOKEN_SALT}
+      STRAPI_API_TOKEN: ${STRAPI_API_TOKEN}
       ADMIN_JWT_SECRET: ${STRAPI_ADMIN_JWT_SECRET}
       JWT_SECRET: ${STRAPI_JWT_SECRET}
       TRANSFER_TOKEN_SALT: ${STRAPI_TRANSFER_TOKEN_SALT}
@@ -51,6 +52,20 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
+      strapi:
+        condition: service_started
+
+  admin:
+    build: ./admin
+    environment:
+      STRAPI_URL: http://strapi:1337
+      STRAPI_API_TOKEN: ${STRAPI_API_TOKEN}
+      ADMIN_USERNAME: ${ADMIN_USERNAME}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD}
+      ADMIN_SESSION_SECRET: ${ADMIN_SESSION_SECRET}
+    ports:
+      - "3000:3000"
+    depends_on:
       strapi:
         condition: service_started
 
