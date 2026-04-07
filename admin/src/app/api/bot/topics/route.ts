@@ -4,11 +4,6 @@ import { isBotAuthorized, unauthorizedResponse } from "@/lib/botAuth";
 
 export async function GET(request: Request) {
   if (!isBotAuthorized(request)) return unauthorizedResponse();
-  const { searchParams } = new URL(request.url);
-  const topicIdParam = searchParams.get("topicId");
-  const where = topicIdParam
-    ? { published: true, topicId: Number(topicIdParam) }
-    : { published: true };
-  const items = await db.task.findMany({ where, orderBy: { order: "asc" } });
+  const items = await db.topic.findMany({ orderBy: { order: "asc" } });
   return NextResponse.json(items);
 }
