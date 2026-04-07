@@ -34,12 +34,20 @@ export interface Exercise {
   type: "suffix" | "choice" | "fill_blank";
   prompt: string;
   answer: string;
+  correctOption?: "A" | "B" | "C" | "D";
   explanation: string;
   optionA?: string;
   optionB?: string;
   optionC?: string;
   optionD?: string;
   image?: { url: string };
+}
+
+export interface Task {
+  id: number;
+  title: string;
+  content: string;
+  order: number;
 }
 
 export interface TelegramUser {
@@ -148,15 +156,27 @@ function httpPut(url: URL, headers: Record<string, string>, data: string): Promi
   });
 }
 
+function getStrapiAuthHeaders(): Record<string, string> {
+  // Accept either raw token or accidental "Bearer <token>" env value.
+  const normalizedToken = config.STRAPI_API_TOKEN.replace(/^Bearer\s+/i, "").trim();
+  return {
+    Authorization: `Bearer ${normalizedToken}`,
+  };
+}
+
 async function strapiGet<T>(path: string, params: Record<string, string> = {}): Promise<T[]> {
   const url = new URL(path, config.STRAPI_URL);
   Object.entries(params).forEach(([k, v]) => url.searchParams.set(k, v));
 
-  const res = await httpGet(url, {
-    Authorization: `Bearer ${config.STRAPI_API_TOKEN}`,
-  });
+  const res = await httpGet(url, getStrapiAuthHeaders());
 
   if (res.status < 200 || res.status >= 300) {
+    if (res.status === 401) {
+      throw new Error(
+        `Strapi auth failed (401). Check STRAPI_API_TOKEN and ensure it is the raw token value (without "Bearer "). ` +
+          `If using Docker Compose, pass STRAPI_API_TOKEN to both bot and strapi services. Response: ${res.body}`,
+      );
+    }
     throw new Error(`Strapi error ${res.status}: ${res.body}`);
   }
 
@@ -195,13 +215,19 @@ export const strapiService = {
     });
   },
 
+  async getTasks(): Promise<Task[]> {
+    return strapiGet<Task>("/api/tasks", {
+      "sort[0]": "order:asc",
+      "pagination[pageSize]": "100",
+      "filters[publishedAt][$notNull]": "true",
+    });
+  },
+
   async upsertTelegramUser(telegramId: number, username?: string, firstName?: string, lastName?: string): Promise<void> {
     const url = new URL("/api/telegram-users", config.STRAPI_URL);
     url.searchParams.set("filters[telegramId][$eq]", telegramId.toString());
-    
-    const headers = {
-      Authorization: `Bearer ${config.STRAPI_API_TOKEN}`,
-    };
+
+    const headers = getStrapiAuthHeaders();
 
     // Check if user exists
     const checkRes = await httpGet(url, headers);
@@ -245,10 +271,8 @@ export const strapiService = {
   async updateExerciseStats(telegramId: number, exerciseId: number, correct: boolean): Promise<void> {
     const url = new URL("/api/telegram-users", config.STRAPI_URL);
     url.searchParams.set("filters[telegramId][$eq]", telegramId.toString());
-    
-    const headers = {
-      Authorization: `Bearer ${config.STRAPI_API_TOKEN}`,
-    };
+
+    const headers = getStrapiAuthHeaders();
 
     const checkRes = await httpGet(url, headers);
     if (checkRes.status < 200 || checkRes.status >= 300) return;
@@ -277,10 +301,8 @@ export const strapiService = {
   async updateTestStats(telegramId: number, score: number, totalQuestions: number): Promise<void> {
     const url = new URL("/api/telegram-users", config.STRAPI_URL);
     url.searchParams.set("filters[telegramId][$eq]", telegramId.toString());
-    
-    const headers = {
-      Authorization: `Bearer ${config.STRAPI_API_TOKEN}`,
-    };
+
+    const headers = getStrapiAuthHeaders();
 
     const checkRes = await httpGet(url, headers);
     if (checkRes.status < 200 || checkRes.status >= 300) return;
