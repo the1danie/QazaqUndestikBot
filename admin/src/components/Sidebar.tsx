@@ -3,13 +3,14 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { LogOut, BookOpen, PenLine, FileText, Video } from "lucide-react";
+import { LogOut, BookOpen, PenLine, FileText, Video, Tag } from "lucide-react";
 
 const NAV = [
   { href: "/dashboard/erezhe",    label: "Ереже",   icon: BookOpen },
   { href: "/dashboard/zhattyghu", label: "Жаттығу", icon: PenLine  },
   { href: "/dashboard/test",      label: "Тест",    icon: FileText },
   { href: "/dashboard/video",     label: "Видео",   icon: Video    },
+  { href: "/dashboard/topics",    label: "Тақырыптар", icon: Tag     },
 ];
 
 export default function Sidebar() {

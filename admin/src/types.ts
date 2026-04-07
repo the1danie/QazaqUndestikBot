@@ -15,6 +15,7 @@ export interface TaskItem {
   title: string;
   content: string;
   order: number;
+  topicId: number | null;
   published: boolean;
   createdAt: Date;
   updatedAt: Date;
@@ -32,6 +33,7 @@ export interface ExerciseItem {
   optionD: string | null;
   explanation: string | null;
   imageUrl: string | null;
+  topicId: number | null;
   published: boolean;
   createdAt: Date;
   updatedAt: Date;
@@ -46,6 +48,7 @@ export interface TestQuestionItem {
   optionD: string;
   correctOption: "A" | "B" | "C" | "D";
   explanation: string | null;
+  topicId: number | null;
   published: boolean;
   createdAt: Date;
   updatedAt: Date;
@@ -59,4 +62,10 @@ export interface VideoItem {
   published: boolean;
   createdAt: Date;
   updatedAt: Date;
+}
+
+export interface TopicItem {
+  id: number;
+  name: string;
+  order: number;
 }
