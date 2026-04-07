@@ -49,6 +49,12 @@ export interface Task {
   order: number;
 }
 
+export interface Topic {
+  id: number;
+  name: string;
+  order: number;
+}
+
 function authHeaders(): Record<string, string> {
   return {
     Authorization: `Bearer ${config.ADMIN_BOT_SECRET}`,
@@ -150,6 +156,31 @@ export const adminApiService = {
 
   getTasks(): Promise<Task[]> {
     return apiGet<Task>("/api/bot/tasks");
+  },
+
+  getTopics(): Promise<Topic[]> {
+    return apiGet<Topic>("/api/bot/topics");
+  },
+
+  getExercisesByTopic(topicId?: number): Promise<Exercise[]> {
+    const path = topicId !== undefined
+      ? `/api/bot/exercises?topicId=${topicId}`
+      : "/api/bot/exercises";
+    return apiGet<Exercise>(path);
+  },
+
+  getTasksByTopic(topicId?: number): Promise<Task[]> {
+    const path = topicId !== undefined
+      ? `/api/bot/tasks?topicId=${topicId}`
+      : "/api/bot/tasks";
+    return apiGet<Task>(path);
+  },
+
+  getTestQuestionsByTopic(topicId?: number): Promise<TestQuestion[]> {
+    const path = topicId !== undefined
+      ? `/api/bot/test-questions?topicId=${topicId}`
+      : "/api/bot/test-questions";
+    return apiGet<TestQuestion>(path);
   },
 
   async upsertUser(telegramId: number, username?: string, firstName?: string, lastName?: string): Promise<void> {

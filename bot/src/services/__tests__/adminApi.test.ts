@@ -107,6 +107,36 @@ describe("adminApiService.getTasks", () => {
   });
 });
 
+describe("adminApiService.getTopics", () => {
+  it("calls /api/bot/topics and returns array", async () => {
+    nock(BASE, { reqheaders: { authorization: `Bearer ${SECRET}` } })
+      .get("/api/bot/topics")
+      .reply(200, [{ id: 1, name: "Ілгерінді үндестік", order: 0 }]);
+
+    const topics = await adminApiService.getTopics();
+    expect(topics).toEqual([{ id: 1, name: "Ілгерінді үндестік", order: 0 }]);
+  });
+});
+
+describe("adminApiService.getExercisesByTopic", () => {
+  it("calls /api/bot/exercises without param when topicId undefined", async () => {
+    nock(BASE, { reqheaders: { authorization: `Bearer ${SECRET}` } })
+      .get("/api/bot/exercises")
+      .reply(200, []);
+
+    await adminApiService.getExercisesByTopic();
+  });
+
+  it("appends topicId query param when provided", async () => {
+    nock(BASE, { reqheaders: { authorization: `Bearer ${SECRET}` } })
+      .get("/api/bot/exercises")
+      .query({ topicId: "5" })
+      .reply(200, []);
+
+    await adminApiService.getExercisesByTopic(5);
+  });
+});
+
 describe("adminApiService.upsertUser", () => {
   it("posts user data and resolves", async () => {
     nock(BASE, { reqheaders: { authorization: `Bearer ${SECRET}` } })
