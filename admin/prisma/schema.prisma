@@ -12,7 +12,7 @@ datasource db {
 
 model Theory {
   id        Int      @id @default(autoincrement())
-  title     String
+  title     String   @unique
   content   String
   order     Int      @default(0)
   published Boolean  @default(false)
@@ -34,6 +34,8 @@ model Exercise {
   optionD       String?
   explanation   String?
   imageUrl      String?
+  topicId       Int?
+  topic         Topic?   @relation(fields: [topicId], references: [id], onDelete: SetNull)
   published     Boolean  @default(false)
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
@@ -43,9 +45,11 @@ model Exercise {
 
 model Task {
   id        Int      @id @default(autoincrement())
-  title     String
+  title     String   @unique
   content   String
   order     Int      @default(0)
+  topicId   Int?
+  topic     Topic?   @relation(fields: [topicId], references: [id], onDelete: SetNull)
   published Boolean  @default(false)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -55,13 +59,15 @@ model Task {
 
 model TestQuestion {
   id            Int      @id @default(autoincrement())
-  question      String
+  question      String   @unique
   optionA       String
   optionB       String
   optionC       String
   optionD       String
   correctOption String
   explanation   String?
+  topicId       Int?
+  topic         Topic?   @relation(fields: [topicId], references: [id], onDelete: SetNull)
   published     Boolean  @default(false)
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
@@ -71,7 +77,7 @@ model TestQuestion {
 
 model Video {
   id          Int      @id @default(autoincrement())
-  title       String
+  title       String   @unique
   url         String
   description String?
   published   Boolean  @default(false)
@@ -79,6 +85,17 @@ model Video {
   updatedAt   DateTime @updatedAt
 
   @@map("videos")
+}
+
+model Topic {
+  id            Int            @id @default(autoincrement())
+  name          String         @unique
+  order         Int            @default(0)
+  exercises     Exercise[]
+  tasks         Task[]
+  testQuestions TestQuestion[]
+
+  @@map("topics")
 }
 
 // ── User Progress ─────────────────────────────────────────
