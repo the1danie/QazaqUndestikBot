@@ -1,12 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import type { TopicItem } from "@/types";
 
 export default function NewExercisePage() {
   const router = useRouter();
@@ -15,8 +16,14 @@ export default function NewExercisePage() {
     prompt: "", answer: "", correctOption: "A" as "A" | "B" | "C" | "D",
     optionA: "", optionB: "", optionC: "", optionD: "", explanation: "",
   });
+  const [topicId, setTopicId] = useState("");
+  const [topics, setTopics] = useState<TopicItem[]>([]);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
+
+  useEffect(() => {
+    fetch("/api/topics").then((r) => r.json()).then((data) => setTopics(data as TopicItem[]));
+  }, []);
 
   function set(key: string, value: string) { setForm((f) => ({ ...f, [key]: value })); }
 
@@ -24,9 +31,10 @@ export default function NewExercisePage() {
     e.preventDefault();
     setSaving(true);
     setError("");
+    const tid = topicId ? Number(topicId) : null;
     const payload = form.type === "choice"
-      ? { type: form.type, prompt: form.prompt, answer: form.correctOption, correctOption: form.correctOption, optionA: form.optionA, optionB: form.optionB, optionC: form.optionC, optionD: form.optionD, explanation: form.explanation }
-      : { type: form.type, prompt: form.prompt, answer: form.answer, explanation: form.explanation };
+      ? { type: form.type, prompt: form.prompt, answer: form.correctOption, correctOption: form.correctOption, optionA: form.optionA, optionB: form.optionB, optionC: form.optionC, optionD: form.optionD, explanation: form.explanation, topicId: tid }
+      : { type: form.type, prompt: form.prompt, answer: form.answer, explanation: form.explanation, topicId: tid };
     const res = await fetch("/api/exercises", {
       method: "POST", headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),
@@ -81,6 +89,18 @@ export default function NewExercisePage() {
             <Input value={form.answer} onChange={(e) => set("answer", e.target.value)} required />
           </div>
         )}
+        <div className="space-y-1">
+          <Label>Тақырып (тема)</Label>
+          <Select value={topicId} onValueChange={(v) => setTopicId(v && v !== "none" ? v : "")}>
+            <SelectTrigger><SelectValue placeholder="— таңдалмаған —" /></SelectTrigger>
+            <SelectContent>
+              <SelectItem value="none">— таңдалмаған —</SelectItem>
+              {topics.map((t) => (
+                <SelectItem key={t.id} value={String(t.id)}>{t.name}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
         <div className="space-y-1">
           <Label>Түсіндірме</Label>
           <Textarea value={form.explanation} onChange={(e) => set("explanation", e.target.value)} className="h-20" />

@@ -1,18 +1,25 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import type { TopicItem } from "@/types";
 
 export default function NewTestPage() {
   const router = useRouter();
   const [form, setForm] = useState({ question: "", optionA: "", optionB: "", optionC: "", optionD: "", correctOption: "A", explanation: "" });
+  const [topicId, setTopicId] = useState("");
+  const [topics, setTopics] = useState<TopicItem[]>([]);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
+
+  useEffect(() => {
+    fetch("/api/topics").then((r) => r.json()).then((data) => setTopics(data as TopicItem[]));
+  }, []);
 
   function set(key: string, value: string) { setForm((f) => ({ ...f, [key]: value })); }
 
@@ -22,7 +29,7 @@ export default function NewTestPage() {
     setError("");
     const res = await fetch("/api/test-questions", {
       method: "POST", headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(form),
+      body: JSON.stringify({ ...form, topicId: topicId ? Number(topicId) : null }),
     });
     if (res.ok) { router.push("/dashboard/test"); router.refresh(); }
     else { const d = await res.json() as { error: string }; setError(d.error); setSaving(false); }
@@ -51,6 +58,18 @@ export default function NewTestPage() {
             <SelectTrigger><SelectValue /></SelectTrigger>
             <SelectContent>
               {(["A", "B", "C", "D"] as const).map((o) => <SelectItem key={o} value={o}>{o}</SelectItem>)}
+            </SelectContent>
+          </Select>
+        </div>
+        <div className="space-y-1">
+          <Label>Тақырып (тема)</Label>
+          <Select value={topicId} onValueChange={(v) => setTopicId(v && v !== "none" ? v : "")}>
+            <SelectTrigger><SelectValue placeholder="— таңдалмаған —" /></SelectTrigger>
+            <SelectContent>
+              <SelectItem value="none">— таңдалмаған —</SelectItem>
+              {topics.map((t) => (
+                <SelectItem key={t.id} value={String(t.id)}>{t.name}</SelectItem>
+              ))}
             </SelectContent>
           </Select>
         </div>

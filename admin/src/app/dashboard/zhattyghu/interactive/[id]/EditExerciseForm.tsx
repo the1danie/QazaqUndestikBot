@@ -14,9 +14,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import type { ExerciseItem } from "@/types";
+import type { ExerciseItem, TopicItem } from "@/types";
 
-export default function EditExerciseForm({ item }: { item: ExerciseItem }) {
+export default function EditExerciseForm({ item, topics }: { item: ExerciseItem; topics: TopicItem[] }) {
   const router = useRouter();
   const [form, setForm] = useState({
     type: item.type,
@@ -31,6 +31,7 @@ export default function EditExerciseForm({ item }: { item: ExerciseItem }) {
     imageUrl: item.imageUrl ?? "",
     published: item.published,
   });
+  const [topicId, setTopicId] = useState<string>(item.topicId ? String(item.topicId) : "");
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
   const [uploading, setUploading] = useState(false);
@@ -59,7 +60,7 @@ export default function EditExerciseForm({ item }: { item: ExerciseItem }) {
     setError("");
     const payload =
       form.type === "choice"
-        ? { ...form, answer: form.correctOption }
+        ? { ...form, answer: form.correctOption, topicId: topicId ? Number(topicId) : null }
         : {
             type: form.type,
             prompt: form.prompt,
@@ -67,6 +68,7 @@ export default function EditExerciseForm({ item }: { item: ExerciseItem }) {
             explanation: form.explanation,
             imageUrl: form.imageUrl,
             published: form.published,
+            topicId: topicId ? Number(topicId) : null,
           };
     const res = await fetch(`/api/exercises/${item.id}`, {
       method: "PUT",
@@ -156,6 +158,18 @@ export default function EditExerciseForm({ item }: { item: ExerciseItem }) {
           onChange={(e) => set("explanation", e.target.value)}
           className="h-20"
         />
+      </div>
+      <div className="space-y-1">
+        <Label>Тақырып (тема)</Label>
+        <Select value={topicId} onValueChange={(v) => setTopicId(v && v !== "none" ? v : "")}>
+          <SelectTrigger><SelectValue placeholder="— таңдалмаған —" /></SelectTrigger>
+          <SelectContent>
+            <SelectItem value="none">— таңдалмаған —</SelectItem>
+            {topics.map((t) => (
+              <SelectItem key={t.id} value={String(t.id)}>{t.name}</SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
       </div>
       <div className="space-y-1">
         <Label>Сурет</Label>

@@ -1,18 +1,26 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import RichEditor from "@/components/RichEditor";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import type { TopicItem } from "@/types";
 
 export default function NewTaskPage() {
   const router = useRouter();
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
+  const [topicId, setTopicId] = useState("");
+  const [topics, setTopics] = useState<TopicItem[]>([]);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
+
+  useEffect(() => {
+    fetch("/api/topics").then((r) => r.json()).then((data) => setTopics(data as TopicItem[]));
+  }, []);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -21,7 +29,7 @@ export default function NewTaskPage() {
     const res = await fetch("/api/tasks", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ title, content }),
+      body: JSON.stringify({ title, content, topicId: topicId ? Number(topicId) : null }),
     });
     if (res.ok) {
       router.push("/dashboard/zhattyghu");
@@ -44,6 +52,18 @@ export default function NewTaskPage() {
         <div className="space-y-1">
           <Label>Мазмұн</Label>
           <RichEditor value={content} onChange={setContent} />
+        </div>
+        <div className="space-y-1">
+          <Label>Тақырып (тема)</Label>
+          <Select value={topicId} onValueChange={(v) => setTopicId(v && v !== "none" ? v : "")}>
+            <SelectTrigger><SelectValue placeholder="— таңдалмаған —" /></SelectTrigger>
+            <SelectContent>
+              <SelectItem value="none">— таңдалмаған —</SelectItem>
+              {topics.map((t) => (
+                <SelectItem key={t.id} value={String(t.id)}>{t.name}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
         {error && <p className="text-red-600 text-sm">{error}</p>}
         <div className="flex gap-3">

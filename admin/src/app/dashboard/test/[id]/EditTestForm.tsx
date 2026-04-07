@@ -14,9 +14,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import type { TestQuestionItem } from "@/types";
+import type { TestQuestionItem, TopicItem } from "@/types";
 
-export default function EditTestForm({ item }: { item: TestQuestionItem }) {
+export default function EditTestForm({ item, topics }: { item: TestQuestionItem; topics: TopicItem[] }) {
   const router = useRouter();
   const [form, setForm] = useState({
     question: item.question,
@@ -30,6 +30,7 @@ export default function EditTestForm({ item }: { item: TestQuestionItem }) {
   });
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
+  const [topicId, setTopicId] = useState<string>(item.topicId ? String(item.topicId) : "");
 
   function set(key: string, value: string | boolean) {
     setForm((f) => ({ ...f, [key]: value }));
@@ -42,7 +43,7 @@ export default function EditTestForm({ item }: { item: TestQuestionItem }) {
     const res = await fetch(`/api/test-questions/${item.id}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(form),
+      body: JSON.stringify({ ...form, topicId: topicId ? Number(topicId) : null }),
     });
     if (res.ok) {
       router.push("/dashboard/test");
@@ -102,6 +103,18 @@ export default function EditTestForm({ item }: { item: TestQuestionItem }) {
           onChange={(e) => set("explanation", e.target.value)}
           className="h-20"
         />
+      </div>
+      <div className="space-y-1">
+        <Label>Тақырып (тема)</Label>
+        <Select value={topicId} onValueChange={(v) => setTopicId(v && v !== "none" ? v : "")}>
+          <SelectTrigger><SelectValue placeholder="— таңдалмаған —" /></SelectTrigger>
+          <SelectContent>
+            <SelectItem value="none">— таңдалмаған —</SelectItem>
+            {topics.map((t) => (
+              <SelectItem key={t.id} value={String(t.id)}>{t.name}</SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
       </div>
       <div className="flex items-center gap-2">
         <Checkbox
