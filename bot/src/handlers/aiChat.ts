@@ -3,7 +3,7 @@ import { InlineKeyboard } from "grammy";
 import { type MyConversation, type MyContext } from "../index";
 import { mainMenuKeyboard } from "../keyboards/menus";
 import { aiService } from "../services/ai";
-import { strapiService } from "../services/strapi";
+import { adminApiService, type TheoryItem } from "../services/adminApi";
 
 const MENU_BUTTON_TEXTS = new Set([
   "📚 Ереже",
@@ -26,10 +26,10 @@ export async function aiChatConversation(
 ): Promise<void> {
   const exitKb = new InlineKeyboard().text("⬅️ Мәзірге оралу", "menu");
 
-  // Load theory from Strapi once for the session
-  const theoryItems = await conversation.external(() => strapiService.getTheory());
+  // Load theory once for the session
+  const theoryItems = await conversation.external(() => adminApiService.getTheory());
   const theoryContext = theoryItems.length > 0
-    ? theoryItems.map((item) => `**${item.title}**\n${item.content}`).join("\n\n")
+    ? theoryItems.map((item: TheoryItem) => `**${item.title}**\n${item.content}`).join("\n\n")
     : "";
 
   await ctx.reply(
