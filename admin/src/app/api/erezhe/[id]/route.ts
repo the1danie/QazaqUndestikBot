@@ -7,11 +7,11 @@ export async function PUT(
 ) {
   try {
     const { id } = await params;
-    const { title, content, published } =
-      (await request.json()) as { title: string; content: string; published: boolean };
+    const { title, content, published, imageUrl, topicId } =
+      (await request.json()) as { title: string; content: string; published: boolean; imageUrl?: string | null; topicId?: number | null };
     const item = await db.theory.update({
       where: { id: Number(id) },
-      data: { title, content, published },
+      data: { title, content, published, imageUrl: imageUrl ?? null, topicId: topicId ?? null },
     });
     return NextResponse.json(item);
   } catch (err) {

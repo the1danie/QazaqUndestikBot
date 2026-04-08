@@ -15,6 +15,9 @@ model Theory {
   title     String   @unique
   content   String
   order     Int      @default(0)
+  imageUrl  String?
+  topicId   Int?
+  topic     Topic?   @relation(fields: [topicId], references: [id], onDelete: SetNull)
   published Boolean  @default(false)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -90,7 +93,7 @@ model Video {
 model Topic {
   id            Int            @id @default(autoincrement())
   name          String         @unique
-  order         Int            @default(0)
+  theories      Theory[]
   exercises     Exercise[]
   tasks         Task[]
   testQuestions TestQuestion[]

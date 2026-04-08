@@ -1,10 +1,10 @@
 import nock from "nock";
 import { aiService } from "../ai";
 
-const BASE = "https://llm.alem.ai";
+const BASE = "https://api.openai.com";
 
 beforeEach(() => {
-  process.env.ALEM_API_KEY = "test_key";
+  process.env.OPENAI_API_KEY = "test_key";
 });
 
 afterEach(() => nock.cleanAll());
@@ -12,7 +12,7 @@ afterEach(() => nock.cleanAll());
 describe("aiService.ask", () => {
   it("returns text from API response", async () => {
     nock(BASE)
-      .post("/chat/completions")
+      .post("/v1/chat/completions")
       .reply(200, {
         choices: [{ message: { content: "Тест жауабы" } }],
       });
@@ -23,7 +23,7 @@ describe("aiService.ask", () => {
 
   it("throws if empty content returned", async () => {
     nock(BASE)
-      .post("/chat/completions")
+      .post("/v1/chat/completions")
       .reply(200, { choices: [] });
 
     await expect(aiService.ask("Сұрақ", "")).rejects.toThrow("Empty AI response");

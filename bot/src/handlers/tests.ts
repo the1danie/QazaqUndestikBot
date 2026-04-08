@@ -101,6 +101,13 @@ export async function testsConversation(
       ? undefined
       : Number(cb.callbackQuery.data.replace("topic_", ""));
 
+  const selectedTopicName =
+    cb.callbackQuery.data === "topic_all"
+      ? "Барлық тақырыптар"
+      : topics.find((t: Topic) => t.id === selectedTopicId)?.name ?? "";
+  await cb.editMessageText(`📚 Тақырып: *${selectedTopicName}*`, { parse_mode: "Markdown" })
+    .catch(() => {});
+
   const questions = await conversation.external(() =>
     adminApiService.getTestQuestionsByTopic(selectedTopicId)
   );

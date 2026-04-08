@@ -8,6 +8,8 @@ export interface TheoryItem {
   title: string;
   content: string;
   order: number;
+  imageUrl: string | null;
+  topicId: number | null;
 }
 
 export interface VideoItem {
@@ -140,6 +142,13 @@ async function apiPost(path: string, body: Record<string, unknown>): Promise<voi
 export const adminApiService = {
   getTheory(): Promise<TheoryItem[]> {
     return apiGet<TheoryItem>("/api/bot/theory");
+  },
+
+  getTheoryByTopic(topicId?: number): Promise<TheoryItem[]> {
+    const path = topicId !== undefined
+      ? `/api/bot/theory?topicId=${topicId}`
+      : "/api/bot/theory";
+    return apiGet<TheoryItem>(path);
   },
 
   getVideos(): Promise<VideoItem[]> {

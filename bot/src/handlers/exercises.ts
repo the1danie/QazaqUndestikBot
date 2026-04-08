@@ -7,8 +7,12 @@ import { config } from "../config";
 
 async function fetchImageBuffer(url: string): Promise<Buffer | null> {
   try {
-    const response = await fetch(url);
+    const response = await fetch(url, {
+      headers: { Authorization: `Bearer ${config.ADMIN_BOT_SECRET}` },
+    });
     if (!response.ok) return null;
+    const contentType = response.headers.get("content-type") ?? "";
+    if (!contentType.startsWith("image/")) return null;
     const arrayBuffer = await response.arrayBuffer();
     return Buffer.from(arrayBuffer);
   } catch {
@@ -24,10 +28,15 @@ async function showExercise(ctx: MyContext, exercise: Exercise): Promise<void> {
       : `${config.ADMIN_URL}${exercise.imageUrl}`;
     const imageBuffer = await fetchImageBuffer(imageUrl);
     if (imageBuffer) {
-      await ctx.replyWithPhoto(new InputFile(imageBuffer, "exercise.png"), { caption: text });
-    } else {
-      await ctx.reply(text);
+      try {
+        const ext = exercise.imageUrl!.split(".").pop()?.toLowerCase() ?? "jpg";
+        await ctx.replyWithPhoto(new InputFile(imageBuffer, `exercise.${ext}`), { caption: text });
+        return;
+      } catch {
+        // fall through to text reply
+      }
     }
+    await ctx.reply(text);
   } else {
     await ctx.reply(text);
   }
@@ -163,6 +172,13 @@ export async function exercisesConversation(
     cb.callbackQuery.data === "topic_all"
       ? undefined
       : Number(cb.callbackQuery.data.replace("topic_", ""));
+
+  const selectedTopicName =
+    cb.callbackQuery.data === "topic_all"
+      ? "Барлық тақырыптар"
+      : topics.find((t: Topic) => t.id === selectedTopicId)?.name ?? "";
+  await cb.editMessageText(`📚 Тақырып: *${selectedTopicName}*`, { parse_mode: "Markdown" })
+    .catch(() => {});
 
   const [tasks, exercises] = await conversation.external(() =>
     Promise.all([

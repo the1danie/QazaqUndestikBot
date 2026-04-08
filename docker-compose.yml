@@ -35,7 +35,7 @@ services:
     build: ./bot
     environment:
       BOT_TOKEN: ${BOT_TOKEN}
-      ALEM_API_KEY: ${ALEM_API_KEY}
+      OPENAI_API_KEY: ${OPENAI_API_KEY}
       ADMIN_URL: http://admin:3000
       ADMIN_BOT_SECRET: ${ADMIN_BOT_SECRET}
     depends_on:

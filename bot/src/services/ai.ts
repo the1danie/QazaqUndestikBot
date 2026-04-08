@@ -41,12 +41,12 @@ function httpPost(url: URL, headers: Record<string, string>, data: string): Prom
 
 export const aiService = {
   async ask(userMessage: string, theoryContext: string): Promise<string> {
-    const url = new URL("https://llm.alem.ai/chat/completions");
+    const url = new URL("https://api.openai.com/v1/chat/completions");
 
     const systemPrompt = BASE_SYSTEM_PROMPT + theoryContext;
 
     const payload = JSON.stringify({
-      model: "gpt-oss",
+      model: "gpt-4o-mini",
       messages: [
         { role: "system", content: systemPrompt },
         { role: "user", content: userMessage },
@@ -54,7 +54,7 @@ export const aiService = {
     });
 
     const res = await httpPost(url, {
-      Authorization: `Bearer ${config.ALEM_API_KEY}`,
+      Authorization: `Bearer ${config.OPENAI_API_KEY}`,
     }, payload);
 
     if (res.status < 200 || res.status >= 300) {

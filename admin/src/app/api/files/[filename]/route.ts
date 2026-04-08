@@ -1,13 +1,17 @@
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";
 import { NextResponse } from "next/server";
+import { isBotAuthorized } from "@/lib/botAuth";
 
 const UPLOADS_DIR = join(process.cwd(), "uploads");
 
 export async function GET(
-  _: Request,
+  request: Request,
   { params }: { params: Promise<{ filename: string }> }
 ) {
+  if (!isBotAuthorized(request)) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
   try {
     const { filename } = await params;
     // Prevent path traversal

@@ -10,7 +10,6 @@ import type { TopicItem } from "@/types";
 export default function EditTopicForm({ item }: { item: TopicItem }) {
   const router = useRouter();
   const [name, setName] = useState(item.name);
-  const [order, setOrder] = useState(String(item.order));
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
 
@@ -21,7 +20,7 @@ export default function EditTopicForm({ item }: { item: TopicItem }) {
     const res = await fetch(`/api/topics/${item.id}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name, order: Number(order) }),
+      body: JSON.stringify({ name }),
     });
     if (res.ok) {
       router.push("/dashboard/topics");
@@ -38,10 +37,6 @@ export default function EditTopicForm({ item }: { item: TopicItem }) {
       <div className="space-y-1">
         <Label>Атауы</Label>
         <Input value={name} onChange={(e) => setName(e.target.value)} required />
-      </div>
-      <div className="space-y-1">
-        <Label>Реттілік (order)</Label>
-        <Input type="number" value={order} onChange={(e) => setOrder(e.target.value)} />
       </div>
       {error && <p className="text-red-600 text-sm">{error}</p>}
       <div className="flex gap-3">

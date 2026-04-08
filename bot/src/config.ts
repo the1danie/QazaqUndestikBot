@@ -10,8 +10,8 @@ export const config = {
   get BOT_TOKEN(): string {
     return require_env("BOT_TOKEN");
   },
-  get ALEM_API_KEY(): string {
-    return require_env("ALEM_API_KEY");
+  get OPENAI_API_KEY(): string {
+    return require_env("OPENAI_API_KEY");
   },
   get ADMIN_URL(): string {
     return require_env("ADMIN_URL");

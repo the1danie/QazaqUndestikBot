@@ -7,8 +7,8 @@ export async function PUT(
 ) {
   try {
     const { id } = await params;
-    const { name, order } = (await request.json()) as { name: string; order: number };
-    const item = await db.topic.update({ where: { id: Number(id) }, data: { name, order } });
+    const { name } = (await request.json()) as { name: string };
+    const item = await db.topic.update({ where: { id: Number(id) }, data: { name } });
     return NextResponse.json(item);
   } catch (err) {
     return NextResponse.json({ error: String(err) }, { status: 500 });

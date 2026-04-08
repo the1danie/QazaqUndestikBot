@@ -3,12 +3,14 @@ import { db } from "@/lib/db";
 
 export async function POST(request: Request) {
   try {
-    const { title, content } = (await request.json()) as {
+    const { title, content, imageUrl, topicId } = (await request.json()) as {
       title: string;
       content: string;
+      imageUrl?: string;
+      topicId?: number | null;
     };
     const item = await db.theory.create({
-      data: { title, content, published: true },
+      data: { title, content, imageUrl: imageUrl ?? null, topicId: topicId ?? null, published: true },
     });
     return NextResponse.json(item);
   } catch (err) {

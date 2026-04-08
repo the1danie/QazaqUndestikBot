@@ -13,7 +13,7 @@ export default async function EditExercisePage({
   const { id } = await params;
   const [item, topics] = await Promise.all([
     db.exercise.findUnique({ where: { id: Number(id) } }),
-    db.topic.findMany({ orderBy: { order: "asc" } }),
+    db.topic.findMany({ orderBy: { name: "asc" } }),
   ]);
   if (!item) notFound();
   return (

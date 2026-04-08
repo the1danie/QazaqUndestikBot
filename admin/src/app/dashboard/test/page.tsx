@@ -8,8 +8,8 @@ export const dynamic = "force-dynamic";
 
 export default async function TestPage() {
   const [items, topics] = await Promise.all([
-    db.testQuestion.findMany(),
-    db.topic.findMany({ orderBy: { order: "asc" } }),
+    db.testQuestion.findMany({ orderBy: { id: "asc" } }),
+    db.topic.findMany({ orderBy: { name: "asc" } }),
   ]);
 
   const topicMap = new Map(topics.map((t) => [t.id, t.name]));

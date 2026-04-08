@@ -5,6 +5,8 @@ export interface TheoryItem {
   title: string;
   content: string;
   order: number;
+  imageUrl: string | null;
+  topicId: number | null;
   published: boolean;
   createdAt: Date;
   updatedAt: Date;
@@ -67,5 +69,4 @@ export interface VideoItem {
 export interface TopicItem {
   id: number;
   name: string;
-  order: number;
 }

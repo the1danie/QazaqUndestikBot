@@ -31,11 +31,11 @@ bot.use(createConversation(testsConversation, "tests"));
 bot.use(createConversation(aiChatConversation, "aiChat"));
 
 bot.command("start", handleStart);
-bot.hears("📚 Ереже", (ctx) => ctx.conversation.enter("theory"));
-bot.hears("📹 Видео", (ctx) => ctx.conversation.enter("video"));
-bot.hears("✏️ Жаттығу", (ctx) => ctx.conversation.enter("exercises"));
-bot.hears("📝 Тест", (ctx) => ctx.conversation.enter("tests"));
-bot.hears("❓ Сұрақ қою", (ctx) => ctx.conversation.enter("aiChat"));
+bot.hears("📚 Ереже", (ctx) => ctx.conversation.enter("theory", { overwrite: true }));
+bot.hears("📹 Видео", (ctx) => ctx.conversation.enter("video", { overwrite: true }));
+bot.hears("✏️ Жаттығу", (ctx) => ctx.conversation.enter("exercises", { overwrite: true }));
+bot.hears("📝 Тест", (ctx) => ctx.conversation.enter("tests", { overwrite: true }));
+bot.hears("❓ Сұрақ қою", (ctx) => ctx.conversation.enter("aiChat", { overwrite: true }));
 
 bot.catch((err) => {
   console.error("Bot error:", err);

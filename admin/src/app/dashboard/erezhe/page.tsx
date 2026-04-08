@@ -7,7 +7,11 @@ import { Plus, Pencil } from "lucide-react";
 export const dynamic = "force-dynamic";
 
 export default async function ErezhePage() {
-  const items = await db.theory.findMany({ orderBy: { order: "asc" } });
+  const [items, topics] = await Promise.all([
+    db.theory.findMany({ orderBy: { order: "asc" } }),
+    db.topic.findMany({ orderBy: { name: "asc" } }),
+  ]);
+  const topicMap = new Map(topics.map((t) => [t.id, t.name]));
 
   return (
     <div>
@@ -31,6 +35,16 @@ export default async function ErezhePage() {
             >
               <div className="flex items-center gap-3 min-w-0">
                 <span className="font-medium truncate">{item.title}</span>
+                {item.topicId && (
+                  <span className="shrink-0 text-xs px-2 py-0.5 rounded-full font-medium bg-purple-100 text-purple-700">
+                    {topicMap.get(item.topicId) ?? ""}
+                  </span>
+                )}
+                {!item.topicId && (
+                  <span className="shrink-0 text-xs px-2 py-0.5 rounded-full font-medium bg-gray-100 text-gray-500">
+                    Тақырыпсыз
+                  </span>
+                )}
                 <span className={`shrink-0 text-xs px-2 py-0.5 rounded-full font-medium ${item.published ? "bg-green-100 text-green-700" : "bg-amber-100 text-amber-700"}`}>
                   {item.published ? "Жарияланған" : "Черновик"}
                 </span>

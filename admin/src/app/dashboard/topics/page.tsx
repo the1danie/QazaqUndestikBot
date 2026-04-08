@@ -7,7 +7,7 @@ import { Plus, Pencil } from "lucide-react";
 export const dynamic = "force-dynamic";
 
 export default async function TopicsPage() {
-  const items = await db.topic.findMany({ orderBy: { order: "asc" } });
+  const items = await db.topic.findMany({ orderBy: { name: "asc" } });
   return (
     <div>
       <div className="flex justify-between items-center mb-6">
@@ -30,7 +30,6 @@ export default async function TopicsPage() {
             >
               <div className="flex items-center gap-3 min-w-0">
                 <span className="text-sm font-medium truncate">{item.name}</span>
-                <span className="shrink-0 text-xs text-muted-foreground">реттілік: {item.order}</span>
               </div>
               <div className="flex gap-1 ml-4 shrink-0">
                 <Button variant="ghost" size="sm" asChild>

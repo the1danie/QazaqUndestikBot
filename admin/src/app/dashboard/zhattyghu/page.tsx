@@ -11,7 +11,7 @@ export default async function ZhattyghuPage() {
   const [tasks, exercises, topics] = await Promise.all([
     db.task.findMany({ orderBy: { order: "asc" } }),
     db.exercise.findMany(),
-    db.topic.findMany({ orderBy: { order: "asc" } }),
+    db.topic.findMany({ orderBy: { name: "asc" } }),
   ]);
 
   const topicMap = new Map(topics.map((t) => [t.id, t.name]));
