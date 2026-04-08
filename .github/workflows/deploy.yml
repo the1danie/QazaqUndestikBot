@@ -15,7 +15,7 @@ jobs:
       - name: Deploy to server
         uses: appleboy/ssh-action@v1.0.3
         with:
-          host: 138.68.133.175
+          host: 89.219.32.104
           username: root
           password: ${{ secrets.DEPLOY_PASSWORD }}
           command_timeout: 10m
