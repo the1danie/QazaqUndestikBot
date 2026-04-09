@@ -20,16 +20,16 @@ jobs:
           password: ${{ secrets.DEPLOY_PASSWORD }}
           command_timeout: 10m
           script: |
-            cd /root/QazaqUndestikBot
-            sudo git pull origin main
+            cd /home/ubuntu/QazaqUndestikBot
+            git pull origin main
 
             # Rebuild admin only if its files changed
-            if sudo git diff --name-only HEAD~1 HEAD | grep -q "^admin/"; then
+            if git diff --name-only HEAD~1 HEAD | grep -q "^admin/"; then
               echo "Admin changed — rebuilding..."
-              sudo docker compose up -d --build admin
+              docker compose up -d --build admin
             else
               echo "Admin unchanged — skipping rebuild"
             fi
 
             # Always rebuild bot (fast, ~30 sec)
-            sudo docker compose up -d --build bot
+            docker compose up -d --build bot
