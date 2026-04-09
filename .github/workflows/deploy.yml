@@ -16,7 +16,7 @@ jobs:
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: 89.219.32.104
-          username: root
+          username: ubuntu
           password: ${{ secrets.DEPLOY_PASSWORD }}
           command_timeout: 10m
           script: |
