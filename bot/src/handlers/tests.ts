@@ -28,13 +28,19 @@ async function runTest(
   for (let i = 0; i < questions.length; i++) {
     const q = questions[i];
     const kb = new InlineKeyboard()
-      .text(`A. ${q.optionA}`, "A")
-      .text(`B. ${q.optionB}`, "B")
+      .text("A", "A").text("B", "B")
       .row()
-      .text(`C. ${q.optionC}`, "C")
-      .text(`D. ${q.optionD}`, "D");
+      .text("C", "C").text("D", "D");
 
-    await ctx.reply(`*Сұрақ ${i + 1}/${questions.length}*\n\n${q.question}`, {
+    const questionText =
+      `*Сұрақ ${i + 1}/${questions.length}*\n\n` +
+      `${q.question}\n\n` +
+      `A. ${q.optionA}\n` +
+      `B. ${q.optionB}\n` +
+      `C. ${q.optionC}\n` +
+      `D. ${q.optionD}`;
+
+    await ctx.reply(questionText, {
       parse_mode: "Markdown",
       reply_markup: kb,
     });
