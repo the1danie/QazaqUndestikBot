@@ -4,6 +4,7 @@ import { backToMenuInline } from "../keyboards/menus";
 import { type MyConversation, type MyContext } from "../index";
 import { adminApiService, type Topic } from "../services/adminApi";
 import { config } from "../config";
+import { htmlToPlain } from "../utils";
 
 async function fetchImageBuffer(url: string): Promise<Buffer | null> {
   try {
@@ -88,7 +89,7 @@ export async function theoryConversation(
   const item = items.find((i) => i.id === itemId);
 
   if (item) {
-    const text = `*${item.title}*\n\n${item.content}`;
+    const text = `*${item.title}*\n\n${htmlToPlain(item.content)}`;
     if (item.imageUrl) {
       const imageUrl = item.imageUrl.startsWith("http")
         ? item.imageUrl

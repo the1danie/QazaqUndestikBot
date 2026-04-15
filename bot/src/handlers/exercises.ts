@@ -4,6 +4,7 @@ import { backToMenuInline } from "../keyboards/menus";
 import { type MyConversation, type MyContext } from "../index";
 import { adminApiService, type Exercise, type Task, type Topic } from "../services/adminApi";
 import { config } from "../config";
+import { htmlToPlain } from "../utils";
 
 async function fetchImageBuffer(url: string): Promise<Buffer | null> {
   try {
@@ -21,7 +22,7 @@ async function fetchImageBuffer(url: string): Promise<Buffer | null> {
 }
 
 async function showExercise(ctx: MyContext, exercise: Exercise): Promise<void> {
-  const text = `✏️ Жаттығу\n\n${exercise.prompt}`;
+  const text = `✏️ Жаттығу\n\n${htmlToPlain(exercise.prompt)}`;
   if (exercise.imageUrl) {
     const imageUrl = exercise.imageUrl.startsWith("http")
       ? exercise.imageUrl
@@ -80,7 +81,7 @@ async function runExercises(
 
   for (let i = 0; i < tasks.length; i++) {
     const task = tasks[i];
-    await ctx.reply(`📄 *${task.title}*\n\n${task.content}`, { parse_mode: "Markdown" });
+    await ctx.reply(`📄 *${task.title}*\n\n${htmlToPlain(task.content)}`, { parse_mode: "Markdown" });
 
     if (i < tasks.length - 1 || exercises.length > 0) {
       const navKb = new InlineKeyboard()
@@ -114,14 +115,14 @@ async function runExercises(
     );
 
     if (isCorrect) {
-      await ctx.reply(`✅ Дұрыс!\n\n${exercise.explanation ?? ""}`);
+      await ctx.reply(`✅ Дұрыс!\n\n${htmlToPlain(exercise.explanation ?? "")}`);
     } else {
       const displayAnswer =
         exercise.type === "choice"
           ? (exercise.correctOption ?? exercise.answer).toUpperCase()
           : exercise.answer;
       await ctx.reply(
-        `❌ Қате. Дұрыс жауап: *${displayAnswer}*\n\n${exercise.explanation ?? ""}`,
+        `❌ Қате. Дұрыс жауап: *${displayAnswer}*\n\n${htmlToPlain(exercise.explanation ?? "")}`,
         { parse_mode: "Markdown" }
       );
     }
